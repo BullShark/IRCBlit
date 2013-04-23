@@ -94,7 +94,9 @@ while(( received = recieveln()) != null ) {
 	}
 }
 
-
+/**************************************
+ * All methods below
+ */
 def divideTwo() {
 	try {
 		first = received.split(" :", 2)[0]
