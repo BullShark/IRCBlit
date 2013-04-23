@@ -40,7 +40,7 @@ def nick = "GitBlit"
 def first
 def last
 Socket sock
-BufferedReader bwriter
+BufferedWriter bwriter
 BufferedReader breader
 //final timeToSleep = 4000;
 
