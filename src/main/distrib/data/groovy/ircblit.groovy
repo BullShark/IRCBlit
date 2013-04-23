@@ -33,12 +33,12 @@ logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}")
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
-server = "frequency.windfyre.net"
-port = "6667"
-channel = "#blackhats"
-nick = "GitBlit"
+def server = "frequency.windfyre.net"
+def port = "6667"
+def channel = "#blackhats"
+def nick = "GitBlit"
 
-final timeToSleep = 4000;
+//final timeToSleep = 4000;
 
 try {
 	sock = new Socket(server, port)
@@ -65,10 +65,22 @@ try {
 
 //TODO Make a separate thread for responding to pings?
 
-try {
+//try {
+//	Thread.sleep(timeToSleep)
+//} catch(InterruptedException ex) {
+//	logger.info("Sleep was interrupted")
+//}
+
+send("Nick ${nick}")
+//XXX What does the 0 and * mean?
+send("User ${nick} 0 * :IRCBlit Service Hook for GitBlit")
+
+def send(line) {
+	bwriter.write(line)
+	bwriter.newLine();
+	bwriter.flush()
+	logger.info("Sent: ${line}")
 }
-
-
 
 
 
