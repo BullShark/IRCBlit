@@ -29,28 +29,30 @@ import org.slf4j.Logger
  */
 
 // Indicate we have started the script
-logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}")
+logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}");
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
-def server = "frequency.windfyre.net"
-def port = 6667
-def channel = "#blackhats"
-def nick = "GitBlit"
-def first
-def last
-Socket sock
-BufferedWriter bwriter
-BufferedReader breader
+def server = "frequency.windfyre.net";
+def port = 6667;
+def channel = "#blackhats";
+def nick = "GitBlit";
+def first;
+def last;
+Socket sock;
+BufferedWriter bwriter;
+BufferedReader breader;
 //final timeToSleep = 4000;
 
 try {
 	sock = new Socket(server, port)
 } catch (IOException ex) {
 	logger.info("Failed to connect to ${server} on ${port}")
+	sock.close()
 	System.exit(-1)
 } catch (UnknownHostException ex) {
 	logger.info("Host ${server} not known")
+	sock.close()
 	System.exit(-1)
 } finally {
 //	sock.close()
@@ -59,93 +61,99 @@ try {
 try {
 	bwriter =
 			new BufferedWriter(
-			new OutputStreamWriter(sock.getOutputStream()))
+			new OutputStreamWriter(sock.getOutputStream()));
 
 	breader = BufferedReader(
-			new InputStreamReader(sock.getInputStream()))
+			new InputStreamReader(sock.getInputStream()));
+	
 } catch(IOException ex) {
-	logger.info("Failed to get I/O streams with the server")
-	System.exit(-1)
+	logger.info("Failed to get I/O streams with the server");
+	System.exit(-1);
 }
+
+//sock.withStreams { inStream, outStream ->
+//	def reader = inStream.newReader()
+//	def
+//}
 
 //TODO Make a separate thread for responding to pings?
 
 //try {
-//	Thread.sleep(timeToSleep)
+//	Thread.sleep(timeToSleep);
 //} catch(InterruptedException ex) {
-//	logger.info("Sleep was interrupted")
+//	logger.info("Sleep was interrupted");
 //}
 
-sendln("Nick ${nick}")
+sendln("Nick ${nick}");
 //XXX What does the 0 and * mean? What is the difference between 0 and 8?
-sendln("USER ${nick} 8 * :IRCBlit Service Hook for GitBlit")
+sendln("USER ${nick} 8 * :IRCBlit Service Hook for GitBlit");
 
 /**
  * Wait for the server to respond with 001
  * Before attempting to join a channel
  */
 while(( received = recieveln()) != null ) {
-	divideTwo()
+	divideTwo();
 
 	if(first.equals("PING")) {
-		sendln("PONG " + last)
+		sendln("PONG " + last);
 	}
 
 	if(first.contains("001")) {
-		break
+		break;
 	}
 }
 
 // Attempt to join the IRC channel
-sendln("JOIN ${chan}")
+sendln("JOIN ${chan}");
 
 // Message the channel
-msgChannel(chan, "Hello ${chan}")
+msgChannel(chan, "Hello ${chan}");
 
 // Leave IRC
-sendln("QUIT")
+sendln("QUIT");
 
 // Close I/O
-bwriter.close()
-breader.clone()
-sock.close()
+bwriter.close();
+breader.clone();
+sock.close();
 
 /**************************************
  * All methods below
  */
 def divideTwo() {
 	try {
-		first = received.split(" :", 2)[0]
-		last = received.split(" :", 2)[1]
+		first = received.split(" :", 2)[0];
+		last = received.split(" :", 2)[1];
 	} catch(ArrayIndexOutOfBoundsException ex) {
-		first = ""
-		last = ""
+		first = "";
+		last = "";
 	}
 }
 
 def sendln(line) {
-	bwriter.write(line)
-	bwriter.newLine()
-	bwriter.flush()
-	logger.info("Sent:\t${line}")
+	bwriter.write(line);
+	bwriter.newLine();
+	bwriter.flush();
+	logger.info("Sent:\t${line}");
 }
 
 def String recieveln() {
 	try {
-		received = breader.readLine()
-		logger.info("Received:\t${line}")
+		received = breader.readLine();
+		logger.info("Received:\t${line}");
 		return received;
 	} catch (IOException ex) {
-		logger.info("Failed to get I/O streams with the server")
+		logger.info("Failed to get I/O streams with the server");
 		return null;
 	}
 }
 
 def msgChannel(chan, msg) {
 	if( !sendln("PRIVMSG " + chan + " :" + msg) ) {
-		logger.info("Failed to send message: \"${msg}\" to channel ${chan}")
+		logger.info("Failed to send message: \"${msg}\" to channel ${chan}");
 	}
-	logger.info("Sent:\tmessage: \"${msg}\" to channel ${chan}")
+	logger.info("Sent:\tmessage: \"${msg}\" to channel ${chan}");
 }
 
 
