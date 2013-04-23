@@ -1,4 +1,4 @@
-package expectusafterlun.ch.irc;
+//package expectusafterlun.ch.irc;
 
 import com.gitblit.GitBlit;
 import com.gitblit.Keys;
