@@ -126,7 +126,12 @@ def String recieveln() {
 	}
 }
 
-
+public msgChannel(chan, msg) {
+	if( !sendln("PRIVMSG " + chan + " :" + msg) ) {
+		logger.info("Failed to send message: \"${msg}\" to channel ${chan}")
+	}
+	return success;
+}
 
 
 
