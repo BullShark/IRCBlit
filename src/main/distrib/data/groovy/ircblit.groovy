@@ -53,7 +53,7 @@ try {
 	logger.info("Host ${server} not known")
 	System.exit(-1)
 } finally {
-	sock.close()
+//	sock.close()
 }
 
 try {
