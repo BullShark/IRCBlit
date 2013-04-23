@@ -40,7 +40,8 @@ def nick = "GitBlit"
 // Used by divideTwo()
 def first
 def last
-
+BufferedReader bwriter
+BufferedReader breader
 //final timeToSleep = 4000;
 
 try {
