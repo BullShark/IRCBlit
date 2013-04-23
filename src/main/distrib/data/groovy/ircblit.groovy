@@ -37,7 +37,6 @@ def server = "frequency.windfyre.net"
 def port = "6667"
 def channel = "#blackhats"
 def nick = "GitBlit"
-// Used by divideTwo()
 def first
 def last
 BufferedReader bwriter
@@ -77,8 +76,8 @@ try {
 //}
 
 sendln("Nick ${nick}")
-//XXX What does the 0 and * mean?
-sendln("User ${nick} 0 * :IRCBlit Service Hook for GitBlit")
+//XXX What does the 0 and * mean? What is the difference between 0 and 8?
+sendln("USER ${nick} 8 * :IRCBlit Service Hook for GitBlit")
 
 /**
  * Wait for the server to respond with 001
@@ -95,6 +94,16 @@ while(( received = recieveln()) != null ) {
 		break
 	}
 }
+
+// Attempt to join the irc channel
+sendln("JOIN ${chan}")
+
+// Message the channel
+msgChannel(chan, "Hello ${chan}")
+
+// Quit and close the connection
+sendln("QUIT")
+
 
 /**************************************
  * All methods below
