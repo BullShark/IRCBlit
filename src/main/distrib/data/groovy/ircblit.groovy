@@ -64,7 +64,7 @@ try {
 			new BufferedWriter(
 			new OutputStreamWriter(sock.getOutputStream()));
 
-	breader = java.io.BufferedReader(
+	breader = BufferedReader(
 			new InputStreamReader(sock.getInputStream()));
 	
 } catch(IOException ex) {
