@@ -65,6 +65,7 @@ try {
 			new InputStreamReader(sock.getInputStream()))
 } catch(IOException ex) {
 	logger.info("Failed to get I/O streams with the server")
+	System.exit(-1)
 }
 
 //TODO Make a separate thread for responding to pings?
