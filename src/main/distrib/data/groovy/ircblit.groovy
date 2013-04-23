@@ -1,15 +1,16 @@
-package expectusafterlun.ch.irc
+package expectusafterlun.ch.irc;
 
-import com.gitblit.GitBlit
-import com.gitblit.Keys
-import com.gitblit.models.RepositoryModel
-import com.gitblit.models.UserModel
-import com.gitblit.utils.JGitUtils
-import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.revwalk.RevCommit
-import org.eclipse.jgit.transport.ReceiveCommand
-import org.eclipse.jgit.transport.ReceiveCommand.Result
-import org.slf4j.Logger
+import com.gitblit.GitBlit;
+import com.gitblit.Keys;
+import com.gitblit.models.RepositoryModel;
+import com.gitblit.models.UserModel;
+import com.gitblit.utils.JGitUtils;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.ReceiveCommand;
+import org.eclipse.jgit.transport.ReceiveCommand.Result;
+import java.io.BufferedReader;
+import org.slf4j.Logger;
 
 /**
  * Sample Gitblit Post-Receive Hook: ircblit
@@ -47,15 +48,15 @@ BufferedReader breader;
 try {
 	sock = new Socket(server, port)
 } catch (IOException ex) {
-	logger.info("Failed to connect to ${server} on ${port}")
-	sock.close()
-	System.exit(-1)
+	logger.info("Failed to connect to ${server} on ${port}");
+	sock.close();
+	System.exit(-1);
 } catch (UnknownHostException ex) {
-	logger.info("Host ${server} not known")
-	sock.close()
-	System.exit(-1)
+	logger.info("Host ${server} not known");
+	sock.close();
+	System.exit(-1);
 } finally {
-//	sock.close()
+//	sock.close();
 }
 
 try {
@@ -63,7 +64,7 @@ try {
 			new BufferedWriter(
 			new OutputStreamWriter(sock.getOutputStream()));
 
-	breader = BufferedReader(
+	breader = java.io.BufferedReader(
 			new InputStreamReader(sock.getInputStream()));
 	
 } catch(IOException ex) {
