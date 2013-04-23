@@ -111,19 +111,19 @@ def sendln(line) {
 	bwriter.write(line)
 	bwriter.newLine()
 	bwriter.flush()
-	logger.info("Sent: ${line}")
+	logger.info("Sent:\t${line}")
 }
 
-//public String recieveln() {
-//	try {
-//		received = breader.readLine();
-//		out.printf("[---]\t%s\n", received); //@TODO Color-code this opposite of colorcode for sent, "[-]" should be blue
-//		return received;
-//	} catch (IOException ex) {
-//		Logger.getLogger(Networking.class.getName()).log(Level.SEVERE, null, ex);
-//		return null;
-//	}
-//}
+def String recieveln() {
+	try {
+		received = breader.readLine()
+		logger.info("Received:\t${line}")
+		return received;
+	} catch (IOException ex) {
+		logger.info("Failed to get I/O streams with the server")
+		return null;
+	}
+}
 
 
 
