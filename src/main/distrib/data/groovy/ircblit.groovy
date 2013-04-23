@@ -31,10 +31,14 @@ import org.slf4j.Logger
 // Indicate we have started the script
 logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}")
 
+//TODO Get Info by Accessing Gitblit Custom Fields
+//TODO And if the fields do not exist, use some defaults
 server = "frequency.windfyre.net"
 port = "6667"
 channel = "#blackhats"
 nick = "GitBlit"
+
+final timeToSleep = 4000;
 
 try {
 	sock = new Socket(server, port)
@@ -58,4 +62,35 @@ try {
 } catch(IOException ex) {
 	logger.info("Failed to get I/O streams with the server")
 }
+
+//TODO Make a separate thread for responding to pings?
+
+try {
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
