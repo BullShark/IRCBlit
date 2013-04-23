@@ -30,3 +30,32 @@ import org.slf4j.Logger
 
 // Indicate we have started the script
 logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}")
+
+server = "frequency.windfyre.net"
+port = "6667"
+channel = "#blackhats"
+nick = "GitBlit"
+
+try {
+	sock = new Socket(server, port)
+} catch (IOException ex) {
+	logger.info("Failed to connect to ${server} on ${port}")
+	System.exit(-1)
+} catch (UnknownHostException ex) {
+	logger.info("Host ${server} not known")
+	System.exit(-1)
+} finally {
+	sock.close()
+}
+
+try {
+	bwriter = 
+	new BufferedWriter(
+		new OutputStreamWriter(sock.getOutputStream()))
+	
+	breader = BufferedReader(
+		new InputStreamReader(sock.getInputStream()))
+} catch(IOException ex) {
+	logger.info("Failed to get I/O streams with the server")
+}
+
