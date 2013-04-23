@@ -34,11 +34,12 @@ logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}")
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
 def server = "frequency.windfyre.net"
-def port = "6667"
+def port = 6667
 def channel = "#blackhats"
 def nick = "GitBlit"
 def first
 def last
+Socket sock
 BufferedReader bwriter
 BufferedReader breader
 //final timeToSleep = 4000;
@@ -95,15 +96,19 @@ while(( received = recieveln()) != null ) {
 	}
 }
 
-// Attempt to join the irc channel
+// Attempt to join the IRC channel
 sendln("JOIN ${chan}")
 
 // Message the channel
 msgChannel(chan, "Hello ${chan}")
 
-// Quit and close the connection
+// Leave IRC
 sendln("QUIT")
 
+// Close I/O
+bwriter.close()
+breader.clone()
+sock.close()
 
 /**************************************
  * All methods below
