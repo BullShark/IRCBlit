@@ -37,6 +37,9 @@ def server = "frequency.windfyre.net"
 def port = "6667"
 def channel = "#blackhats"
 def nick = "GitBlit"
+// Used by divideTwo()
+def first
+def last
 
 //final timeToSleep = 4000;
 
@@ -53,12 +56,12 @@ try {
 }
 
 try {
-	bwriter = 
-	new BufferedWriter(
-		new OutputStreamWriter(sock.getOutputStream()))
-	
+	bwriter =
+			new BufferedWriter(
+			new OutputStreamWriter(sock.getOutputStream()))
+
 	breader = BufferedReader(
-		new InputStreamReader(sock.getInputStream()))
+			new InputStreamReader(sock.getInputStream()))
 } catch(IOException ex) {
 	logger.info("Failed to get I/O streams with the server")
 }
@@ -71,22 +74,54 @@ try {
 //	logger.info("Sleep was interrupted")
 //}
 
-send("Nick ${nick}")
+sendln("Nick ${nick}")
 //XXX What does the 0 and * mean?
-send("User ${nick} 0 * :IRCBlit Service Hook for GitBlit")
+sendln("User ${nick} 0 * :IRCBlit Service Hook for GitBlit")
 
-def send(line) {
+/**
+ * Wait for the server to respond with 001
+ * Before attempting to join a channel
+ */
+while(( received = recieveln()) != null ) {
+	divideTwo()
+
+	if(first.equals("PING")) {
+		sendln("PONG " + last)
+	}
+
+	if(first.contains("001")) {
+		break
+	}
+}
+
+
+def divideTwo() {
+	try {
+		first = received.split(" :", 2)[0]
+		last = received.split(" :", 2)[1]
+	} catch(ArrayIndexOutOfBoundsException ex) {
+		first = ""
+		last = ""
+	}
+}
+
+def sendln(line) {
 	bwriter.write(line)
-	bwriter.newLine();
+	bwriter.newLine()
 	bwriter.flush()
 	logger.info("Sent: ${line}")
 }
 
-
-
-
-
-
+//public String recieveln() {
+//	try {
+//		received = breader.readLine();
+//		out.printf("[---]\t%s\n", received); //@TODO Color-code this opposite of colorcode for sent, "[-]" should be blue
+//		return received;
+//	} catch (IOException ex) {
+//		Logger.getLogger(Networking.class.getName()).log(Level.SEVERE, null, ex);
+//		return null;
+//	}
+//}
 
 
 
