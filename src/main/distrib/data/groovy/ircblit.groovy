@@ -230,7 +230,7 @@ class IRCBlit {
 			}
 			Thread.sleep(pollTime);
 		}
-
+		logger.info("Broke loop, exiting waitFor001");
 	}
 
 	/**
