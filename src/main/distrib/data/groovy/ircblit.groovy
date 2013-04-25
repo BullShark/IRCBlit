@@ -42,167 +42,198 @@ import java.util.HashMap;
 // Indicate we have started the script
 logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}");
 
-// Set up variables
-def server = "frequency.windfyre.net";
-def port = 6667;
-def channel = "#blackhats";
-def nick = "GitBlit";
-def first;
-def last;
-Socket socket;
-BufferedWriter bWriter;
-BufferedReader bReader;
+class IRCBlit {
+	// Create variables
+	def server;
+	def port;
+	def channel;
+	def nick;
+	def first;
+	def last;
+	Socket socket;
+	BufferedWriter bWriter;
+	BufferedReader bReader;
 
-/**
- * 
- * @return
- */
-def createIRCSocket() {
-	try {
-		socket = new Socket(server, port)
-	} catch (IOException ex) {
-		logger.info("Failed to connect to ${server} on ${port}");
-		socket.close();
-		System.exit(-1);
-	} catch (UnknownHostException ex) {
-		logger.info("Host ${server} not known");
-		socket.close();
-		System.exit(-1);
+	IRCBlit() {
+		initialize();
+		createIRCSocket();
+		createIOStreams();
+		waitFor001();
+		sendNickAndUserMessages();
+		joinChannel();
+		// Send a test message the channel
+		msgChannel(chan, "Hello ${chan}");
+		quitAndCloseStreams();
 	}
-}
 
-/**
- * 
- * @return
- */
-def createIOStreams() {
-	try {
-		//	bWriter =
-		//			new BufferedWriter(
-		//			new OutputStreamWriter(socket.getOutputStream()));
-
-		OutputStream sockOut = socket.getOutputStream();
-		OutputStreamWriter osw = new OutputStreamWriter(sockOut);
-		bWriter = new BufferedWriter(osw)
-
-
-		//	bReader = BufferedReader(
-		//			new InputStreamReader(socket.getInputStream()));
-
-		InputStream sockIn = socket.getInputStream();
-		InputStreamReader isr = new InputStreamReader(sockIn);
-		bReader = new BufferedReader(isr);
-
-		logger.info("Set up I/O streams with the server");
-
-	} catch(IOException ex) {
-		logger.info("Failed to get I/O streams with the server");
-		System.exit(-1);
-	}
-}
-
-/**
- * 
- * @return
- */
-def divideTwo() {
-	try {
-		first = received.split(" :", 2)[0];
-		last = received.split(" :", 2)[1];
-	} catch(ArrayIndexOutOfBoundsException ex) {
+	/**
+	 * 
+	 * @return
+	 */
+	def initialize() {
+		server = "frequency.windfyre.net";
+		port = 6667;
+		channel = "#blackhats";
+		nick = "GitBlit";
 		first = "";
 		last = "";
+		socket = null;
+		bWriter = null;
+		bReader = null;
 	}
-}
 
-/**
- * Wait for the server to respond with 001
- * Before attempting to join a channel
- * @return
- */
-def waitFor001() {
-
-	while(( received = recieveln()) != null ) {
-		divideTwo();
-
-		if(first.equals("PING")) {
-			logger.info("Pinging server: ${last}");
-			sendln("PONG " + last);
+	/**
+	 * 
+	 * @return
+	 */
+	def createIRCSocket() {
+		try {
+			socket = new Socket(server, port)
+		} catch (IOException ex) {
+			logger.info("Failed to connect to ${server} on ${port}");
+			socket.close();
+			System.exit(-1);
+		} catch (UnknownHostException ex) {
+			logger.info("Host ${server} not known");
+			socket.close();
+			System.exit(-1);
 		}
+	}
 
-		if(first.contains("001")) {
-			logger.info("Received IRC Code 001");
-			break;
+	/**
+	 * 
+	 * @return
+	 */
+	def createIOStreams() {
+		try {
+			//	bWriter =
+			//			new BufferedWriter(
+			//			new OutputStreamWriter(socket.getOutputStream()));
+
+			OutputStream sockOut = socket.getOutputStream();
+			OutputStreamWriter osw = new OutputStreamWriter(sockOut);
+			bWriter = new BufferedWriter(osw)
+
+
+			//	bReader = BufferedReader(
+			//			new InputStreamReader(socket.getInputStream()));
+
+			InputStream sockIn = socket.getInputStream();
+			InputStreamReader isr = new InputStreamReader(sockIn);
+			bReader = new BufferedReader(isr);
+
+			logger.info("Set up I/O streams with the server");
+
+		} catch(IOException ex) {
+			logger.info("Failed to get I/O streams with the server");
+			System.exit(-1);
 		}
 	}
-}
 
-/**
- * 
- * @param line
- * @return
- */
-def sendln(line) {
-	bWriter.write(line);
-	bWriter.newLine();
-	bWriter.flush();
-	logger.info("Sent:\t${line}");
-}
+	def sendNickAndUserMessages() {
+		logger.info("Sending bot's nick to the server");
 
-/**
- * 
- * @return
- */
-def String recieveln() {
-	try {
-		received = bReader.readLine();
-		logger.info("Received:\t${line}");
-		return received;
-	} catch (IOException ex) {
-		logger.info("Failed to get I/O streams with the server");
-		return null;
+		sendln("Nick ${nick}");
+		sendln("USER ${nick} 8 * :IRCBlit Service Hook for GitBlit");
+	}
+
+	def joinChannel() {
+		// Attempt to join the IRC channel
+		sendln("JOIN ${chan}");
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	def divideTwo() {
+		try {
+			first = received.split(" :", 2)[0];
+			last = received.split(" :", 2)[1];
+		} catch(ArrayIndexOutOfBoundsException ex) {
+			first = "";
+			last = "";
+		}
+	}
+
+	/**
+	 * Wait for the server to respond with 001
+	 * Before attempting to join a channel
+	 * @return
+	 */
+	def waitFor001() {
+
+		while(( received = recieveln()) != null ) {
+			divideTwo();
+
+			if(first.equals("PING")) {
+				logger.info("Pinging server: ${last}");
+				sendln("PONG " + last);
+			}
+
+			if(first.contains("001")) {
+				logger.info("Received IRC Code 001");
+				break;
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param line
+	 * @return
+	 */
+	def sendln(line) {
+		bWriter.write(line);
+		bWriter.newLine();
+		bWriter.flush();
+		logger.info("Sent:\t${line}");
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	def String recieveln() {
+		try {
+			received = bReader.readLine();
+			logger.info("Received:\t${line}");
+			return received;
+		} catch (IOException ex) {
+			logger.info("Failed to get I/O streams with the server");
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * @param chan
+	 * @param msg
+	 * @return
+	 */
+	def msgChannel(chan, msg) {
+		if( !sendln("PRIVMSG " + chan + " :" + msg) ) {
+			logger.info("Failed to send message: \"${msg}\" to channel ${chan}");
+		}
+		logger.info("Sent:\tmessage: \"${msg}\" to channel ${chan}");
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	def quitAndCloseStreams() {
+		// Leave IRC
+		sendln("QUIT");
+
+		// Close I/O
+		bWriter.close();
+		bReader.clone();
+		socket.close();
 	}
 }
 
-/**
- * 
- * @param chan
- * @param msg
- * @return
- */
-def msgChannel(chan, msg) {
-	if( !sendln("PRIVMSG " + chan + " :" + msg) ) {
-		logger.info("Failed to send message: \"${msg}\" to channel ${chan}");
-	}
-	logger.info("Sent:\tmessage: \"${msg}\" to channel ${chan}");
-}
-
-/**
- * 
- * @return
- */
-def quitAndCloseStreams() {
-	// Leave IRC
-	sendln("QUIT");
-
-	// Close I/O
-	bWriter.close();
-	bReader.clone();
-	socket.close();
-}
-
-logger.info("Sending bot's nick to the server");
-
-sendln("Nick ${nick}");
-
-sendln("USER ${nick} 8 * :IRCBlit Service Hook for GitBlit");
-
-
-// Attempt to join the IRC channel
-sendln("JOIN ${chan}");
-
-// Message the channel
-msgChannel(chan, "Hello ${chan}");
+new IRCBlit();
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
