@@ -228,6 +228,7 @@ class IRCBlit {
 				logger.info("Breaking the wait for 001 loop");
 				break;
 			}
+			logger.info("Still in loop");
 			Thread.sleep(pollTime);
 		}
 		logger.info("Broke loop, exiting waitFor001");
