@@ -6,19 +6,19 @@ IRCBlit is an IRC Service Hook for Gitblit similar to Github's.
 GitBlit Sample Hooks
 --------------------
 
-(https://code.google.com/p/gitblit/source/browse/src/main/distrib/data/groovy/)
+[https://code.google.com/p/gitblit/source/browse/src/main/distrib/data/groovy/](https://code.google.com/p/gitblit/source/browse/src/main/distrib/data/groovy/)
 
 GitHub IRC Service Hook
 -----------------------
 
 This is included under the examples/ directory of the project.
 
-(https://github.com/github/github-services/blob/master/lib/services/irc.rb)
+[https://github.com/github/github-services/blob/master/lib/services/irc.rb](https://github.com/github/github-services/blob/master/lib/services/irc.rb)
 
 All of GitHub's Service Hooks
 -----------------------------
 
-(https://github.com/github/github-services)
+[https://github.com/github/github-services](https://github.com/github/github-services)
 
 
 Gitblit
