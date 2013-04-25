@@ -76,7 +76,7 @@ class IRCBlit {
 		receivedT = new Thread() {
 
 					public void run() {
-						logger.info("receivedT thread started");
+						logger.info("Thread started: ${receivedT}");
 						//TODO Can we remove the assigning since receiveln() already does that?
 						while(( received = recieveln()) != null ) {
 							divideTwo();
@@ -172,6 +172,10 @@ class IRCBlit {
 		}
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	def sendNickAndUserMessages() {
 		logger.info("Sending bot's nick to the server");
 
@@ -179,8 +183,11 @@ class IRCBlit {
 		sendln("USER ${nick} 8 * :IRCBlit Service Hook for GitBlit");
 	}
 
+	/**
+	 * Attempt to join the IRC chan
+	 * @return
+	 */
 	def joinChannel() {
-		// Attempt to join the IRC chan
 		sendln("JOIN ${chan}");
 	}
 
@@ -213,6 +220,11 @@ class IRCBlit {
 		}
 	}
 	
+	/**
+	 * Waits for the channel to be joined
+	 * Useful to avoid sending messages to a channel before it's joined
+	 * @return
+	 */
 	def waitForChannelJoined() {
 		while(true) {
 			if(joined) {
@@ -224,8 +236,8 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
-	 * @param line
+	 * Sends a raw line to the irc server
+	 * @param line The line to send to the server
 	 * @return
 	 */
 	def sendln(line) {
@@ -259,9 +271,9 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
-	 * @param chan
-	 * @param msg
+	 * Sends a message to a channel
+	 * @param chan Channel to send the message to
+	 * @param msg Message to be sent to the channel
 	 * @return
 	 */
 	def msgChannel(chan, msg) {
@@ -272,6 +284,7 @@ class IRCBlit {
 
 	/**
 	 * 
+	 * @param sendQuit
 	 * @return
 	 */
 	def quitAndCloseStreams(sendQuit) {
