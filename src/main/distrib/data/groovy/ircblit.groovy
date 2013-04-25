@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.net.SocketException;
 
 /**
  * Sample Gitblit Post-Receive Hook: ircblit
@@ -57,7 +58,8 @@ class IRCBlit {
 	BufferedWriter bWriter;
 	BufferedReader bReader;
 	def logger;
-	Thread pingT;
+	Thread receivedT;
+	def pollTime;
 
 	/**
 	 * 
@@ -67,11 +69,13 @@ class IRCBlit {
 		initialize(logger);
 		createIRCSocket();
 		createIOStreams();
-		waitFor001();
 
-		pingT = new Thread() {
+		receivedT = new Thread() {
+					def received001 = false;
+					
 					public void run() {
 						//TODO Can we remove the assigning since receiveln() already does that?
+						def received001 = false;
 						while(( received = recieveln()) != null ) {
 							divideTwo();
 
@@ -79,10 +83,18 @@ class IRCBlit {
 								logger.info("Pinging server: ${last}");
 								sendln("PONG " + last);
 							}
+							if(first.contains("001")) {
+								logger.info("Received IRC Code 001");
+								received001 = true;
+							}
 						}
+					}
+					def boolean receivedWelcomeCode() {
+						return received001;
 					}
 				};
 
+		waitFor001();
 		sendNickAndUserMessages();
 		joinChannel();
 		// Send a test message the chan
@@ -106,6 +118,7 @@ class IRCBlit {
 		bWriter = null;
 		bReader = null;
 		this.logger = logger;
+		pollTime = 500; // Time in ms between checks for 001 welcome message 
 	}
 
 	/**
@@ -189,19 +202,28 @@ class IRCBlit {
 	 */
 	def waitFor001() {
 
-		while(( received = recieveln()) != null ) {
-			divideTwo();
-
-			if(first.equals("PING")) {
-				logger.info("Pinging server: ${last}");
-				sendln("PONG " + last);
-			}
-
-			if(first.contains("001")) {
-				logger.info("Received IRC Code 001");
+		//		while(( received = recieveln()) != null ) {
+		//			divideTwo();
+		//
+		//			if(first.equals("PING")) {
+		//				logger.info("Pinging server: ${last}");
+		//				sendln("PONG " + last);
+		//			}
+		//
+		//			if(first.contains("001")) {
+		//				logger.info("Received IRC Code 001");
+		//				break;
+		//			}
+		//		}
+		
+		//TODO Add timer that breaks this loop after X seconds if the message wasn't received?
+		while(true) {
+			if(receivedT.receivedWelcomeCode()) {
 				break;
 			}
+			Thread.sleep(pollTime);
 		}
+
 	}
 
 	/**
@@ -210,14 +232,18 @@ class IRCBlit {
 	 * @return
 	 */
 	def sendln(line) {
-		if(socket == null || bWriter == null) {
+		try {
+			if(socket == null || bWriter == null) {
+				throw new SocketException("Socket or ouptut stream is null");
+			}
+			bWriter.write(line);
+			bWriter.newLine();
+			bWriter.flush();
+			logger.info("Sent:\t${line}");
+		} catch (SocketException ex) {
 			logger.info("No connection to the server, exiting");
 			quitAndCloseStreams(false);
 		}
-		bWriter.write(line);
-		bWriter.newLine();
-		bWriter.flush();
-		logger.info("Sent:\t${line}");
 	}
 
 	/**
@@ -259,7 +285,7 @@ class IRCBlit {
 			sendln("QUIT");
 		}
 
-		// Kill Ping Thread
+		// Kill Ping Thread TODO
 
 		// Close I/O
 		bWriter.close();
