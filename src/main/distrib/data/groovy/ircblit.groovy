@@ -12,6 +12,13 @@ import org.eclipse.jgit.transport.ReceiveCommand.Result;
 import java.io.BufferedReader;
 import org.slf4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * Sample Gitblit Post-Receive Hook: ircblit
  *
@@ -40,39 +47,37 @@ def channel = "#blackhats";
 def nick = "GitBlit";
 def first;
 def last;
-Socket sock;
+Socket socket;
 BufferedWriter bwriter;
 BufferedReader breader;
 //final timeToSleep = 4000;
 
 try {
-	sock = new Socket(server, port)
+	socket = new Socket(server, port)
 } catch (IOException ex) {
 	logger.info("Failed to connect to ${server} on ${port}");
-	sock.close();
+	socket.close();
 	System.exit(-1);
 } catch (UnknownHostException ex) {
 	logger.info("Host ${server} not known");
-	sock.close();
+	socket.close();
 	System.exit(-1);
-} finally {
-//	sock.close();
 }
 
 try {
 	bwriter =
 			new BufferedWriter(
-			new OutputStreamWriter(sock.getOutputStream()));
+			new OutputStreamWriter(socket.getOutputStream()));
 
 	breader = BufferedReader(
-			new InputStreamReader(sock.getInputStream()));
+			new InputStreamReader(socket.getInputStream()));
 	
 } catch(IOException ex) {
 	logger.info("Failed to get I/O streams with the server");
 	System.exit(-1);
 }
 
-//sock.withStreams { inStream, outStream ->
+//socket.withStreams { inStream, outStream ->
 //	def reader = inStream.newReader()
 //	def
 //}
@@ -117,7 +122,7 @@ sendln("QUIT");
 // Close I/O
 bwriter.close();
 breader.clone();
-sock.close();
+socket.close();
 
 /**************************************
  * All methods below
