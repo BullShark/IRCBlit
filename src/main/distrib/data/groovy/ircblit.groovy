@@ -16,6 +16,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.OutputStream;
+import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -48,8 +51,8 @@ def nick = "GitBlit";
 def first;
 def last;
 Socket socket;
-BufferedWriter bwriter;
-BufferedReader breader;
+BufferedWriter bWriter;
+BufferedReader bReader;
 
 try {
 	socket = new Socket(server, port)
@@ -64,21 +67,21 @@ try {
 }
 
 try {
-	bwriter =
-			new BufferedWriter(
-			new OutputStreamWriter(socket.getOutputStream()));
+//	bWriter =
+//			new BufferedWriter(
+//			new OutputStreamWriter(socket.getOutputStream()));
+	
+	OutputStream sockOut = socket.getOutputStream();
+	OutputStreamWriter osw = new OutputStreamWriter(sockOut);
+	bWriter = new BufferedWriter(osw)
 
-//	breader = BufferedReader(
+
+//	bReader = BufferedReader(
 //			new InputStreamReader(socket.getInputStream()));
 		
 		InputStream sockIn = socket.getInputStream();
 		InputStreamReader isr = new InputStreamReader(sockIn);
-		breader = new BufferedReader(isr);
-		
-//		InputStream stdin = proc.getInputStream();
-//		InputStreamReader isr = new InputStreamReader(stdin);
-//		BufferedReader br = new BufferedReader(isr);
-		
+		bReader = new BufferedReader(isr);
 	
 } catch(IOException ex) {
 	logger.info("Failed to get I/O streams with the server");
@@ -122,8 +125,8 @@ msgChannel(chan, "Hello ${chan}");
 sendln("QUIT");
 
 // Close I/O
-bwriter.close();
-breader.clone();
+bWriter.close();
+bReader.clone();
 socket.close();
 
 /**************************************
@@ -140,15 +143,15 @@ def divideTwo() {
 }
 
 def sendln(line) {
-	bwriter.write(line);
-	bwriter.newLine();
-	bwriter.flush();
+	bWriter.write(line);
+	bWriter.newLine();
+	bWriter.flush();
 	logger.info("Sent:\t${line}");
 }
 
 def String recieveln() {
 	try {
-		received = breader.readLine();
+		received = bReader.readLine();
 		logger.info("Received:\t${line}");
 		return received;
 	} catch (IOException ex) {
