@@ -86,9 +86,9 @@ class IRCBlit {
 								sendln("PONG " + last);
 							} else if(first.contains("001")) {
 								received001 = true;
-							}// else if(received.contains("JOIN :${chan}")) {
-//								joined = true;
-//							}
+							} else if(received.contains("JOIN :${chan}")) {
+								joined = true;
+							}
 						}
 					}
 				};
@@ -121,8 +121,7 @@ class IRCBlit {
 		this.logger = logger;
 		pollTime = 500; // Time in ms between checks for server messages
 		received001 = false;
-//		joined = false;
-		joined = true;
+		joined = false;
 	}
 
 	/**
@@ -164,7 +163,7 @@ class IRCBlit {
 			System.exit(-1);
 		}
 	}
-	
+
 	def createReceivedThread() {
 		//TODO Move code here when it's working
 	}
@@ -217,7 +216,7 @@ class IRCBlit {
 			Thread.sleep(pollTime);
 		}
 	}
-	
+
 	/**
 	 * Waits for the channel to be joined
 	 * Useful to avoid sending messages to a channel before it's joined
