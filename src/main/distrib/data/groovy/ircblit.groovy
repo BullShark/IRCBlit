@@ -223,12 +223,12 @@ class IRCBlit {
 		//		}
 
 		//TODO Add timer that breaks this loop after X seconds if the message wasn't received?
+		getout:
 		while(true) {
 			if(receivedT.receivedWelcomeCode()) {
 				logger.info("Breaking the wait for 001 loop");
-				break;
+				break getout;
 			}
-			logger.info("Still in loop");
 			Thread.sleep(pollTime);
 		}
 		logger.info("Broke loop, exiting waitFor001");
