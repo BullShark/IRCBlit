@@ -50,7 +50,6 @@ def last;
 Socket socket;
 BufferedWriter bwriter;
 BufferedReader breader;
-//final timeToSleep = 4000;
 
 try {
 	socket = new Socket(server, port)
@@ -92,12 +91,6 @@ try {
 //}
 
 //TODO Make a separate thread for responding to pings?
-
-//try {
-//	Thread.sleep(timeToSleep);
-//} catch(InterruptedException ex) {
-//	logger.info("Sleep was interrupted");
-//}
 
 sendln("Nick ${nick}");
 //XXX What does the 0 and * mean? What is the difference between 0 and 8?
