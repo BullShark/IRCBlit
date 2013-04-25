@@ -72,6 +72,7 @@ class IRCBlit {
 		createIOStreams();
 
 		receivedT = new Thread() {
+			logger.info("receivedT thread started");
 					def received001 = false;
 					
 					public void run() {
@@ -95,6 +96,7 @@ class IRCBlit {
 						return received001;
 					}
 				};
+			receivedT.start();
 
 		waitFor001();
 		sendNickAndUserMessages();
