@@ -61,6 +61,7 @@ class IRCBlit {
 	def logger;
 	Thread receivedT;
 	def pollTime;
+	def received001;
 
 	/**
 	 * 
@@ -72,8 +73,6 @@ class IRCBlit {
 		createIOStreams();
 
 		receivedT = new Thread() {
-
-					def received001 = false;
 
 					public void run() {
 						logger.info("receivedT thread started");
@@ -92,9 +91,6 @@ class IRCBlit {
 								received001 = true;
 							}
 						}
-					}
-					def boolean receivedWelcomeCode() {
-						return received001;
 					}
 				};
 		receivedT.start();
@@ -125,6 +121,7 @@ class IRCBlit {
 		bReader = null;
 		this.logger = logger;
 		pollTime = 500; // Time in ms between checks for 001 welcome message
+		received001 = false;
 	}
 
 	/**
@@ -223,11 +220,10 @@ class IRCBlit {
 		//		}
 
 		//TODO Add timer that breaks this loop after X seconds if the message wasn't received?
-		getout:
 		while(true) {
-			if(receivedT.receivedWelcomeCode()) {
+			if(received001) {
 				logger.info("Breaking the wait for 001 loop");
-				break getout;
+				break;
 			}
 			Thread.sleep(pollTime);
 		}
