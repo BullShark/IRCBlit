@@ -77,8 +77,10 @@ class IRCBlit {
 		waitFor001();
 		joinChannel();
 		waitForChannelJoined();
-		// Send a test message the chan
+		// Send a test message to the chan
 		msgChannel(chan, "Hello ${chan}");
+		// Send a test notice to the chan
+		noticeChannel(chan, "c|c is a n00b!")
 		quitAndCloseStreams();
 	}
 
@@ -144,7 +146,8 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
+	 * Create a thread for handling received messages from the server
+	 * And start the thread
 	 * @return
 	 */
 	def createReceivedThread() {
@@ -278,7 +281,20 @@ class IRCBlit {
 			logger.info("Failed to send message: \"${msg}\" to chan ${chan}");
 		}
 	}
+	
 
+	/**
+	 * Sends a notice to a channel
+	 * @param chan Channel to send the notice to
+	 * @param msg Notice to be sent to the channel
+	 * @return
+	 */
+	noticeChannel(chan, msg) {
+		if( !sendln("NOTICE " + chan + " :" + msg) ) {
+			logger.info("Failed to send notice: \"${msg}\" to chan ${chan}");
+		}
+	}
+	
 	/**
 	 * 
 	 * @param sendQuit
@@ -287,10 +303,11 @@ class IRCBlit {
 	def quitAndCloseStreams(sendQuit) {
 		// Leave IRC
 		if(sendQuit) {
-			sendln("QUIT");
+			sendln("QUIT :GitBlit Service Hook by BullShark");
 		}
 
 		// TODO Kill Received Thread
+		//receivedT
 
 		// Close I/O
 		bWriter.close();
