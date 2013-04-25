@@ -48,6 +48,7 @@ class IRCBlit {
 	def port;
 	def channel;
 	def nick;
+	def received;
 	def first;
 	def last;
 	Socket socket;
@@ -55,6 +56,10 @@ class IRCBlit {
 	BufferedReader bReader;
 	def logger;
 
+	/**
+	 * 
+	 * @param logger
+	 */
 	IRCBlit(logger) {
 		initialize(logger);
 		createIRCSocket();
@@ -76,6 +81,7 @@ class IRCBlit {
 		port = 6667;
 		channel = "#blackhats";
 		nick = "GitBlit";
+		received = "";
 		first = "";
 		last = "";
 		socket = null;
