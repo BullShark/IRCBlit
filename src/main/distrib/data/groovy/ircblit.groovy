@@ -54,84 +54,6 @@ Socket socket;
 BufferedWriter bWriter;
 BufferedReader bReader;
 
-try {
-	socket = new Socket(server, port)
-} catch (IOException ex) {
-	logger.info("Failed to connect to ${server} on ${port}");
-	socket.close();
-	System.exit(-1);
-} catch (UnknownHostException ex) {
-	logger.info("Host ${server} not known");
-	socket.close();
-	System.exit(-1);
-}
-
-try {
-	//	bWriter =
-	//			new BufferedWriter(
-	//			new OutputStreamWriter(socket.getOutputStream()));
-
-	OutputStream sockOut = socket.getOutputStream();
-	OutputStreamWriter osw = new OutputStreamWriter(sockOut);
-	bWriter = new BufferedWriter(osw)
-
-
-	//	bReader = BufferedReader(
-	//			new InputStreamReader(socket.getInputStream()));
-
-	InputStream sockIn = socket.getInputStream();
-	InputStreamReader isr = new InputStreamReader(sockIn);
-	bReader = new BufferedReader(isr);
-
-} catch(IOException ex) {
-	logger.info("Failed to get I/O streams with the server");
-	System.exit(-1);
-}
-
-//socket.withStreams { inStream, outStream ->
-//	def reader = inStream.newReader()
-//	def
-//}
-
-//TODO Make a separate thread for responding to pings?
-
-sendln("Nick ${nick}");
-//XXX What does the 0 and * mean? What is the difference between 0 and 8?
-sendln("USER ${nick} 8 * :IRCBlit Service Hook for GitBlit");
-
-/**
- * Wait for the server to respond with 001
- * Before attempting to join a channel
- */
-while(( received = recieveln()) != null ) {
-	divideTwo();
-
-	if(first.equals("PING")) {
-		sendln("PONG " + last);
-	}
-
-	if(first.contains("001")) {
-		break;
-	}
-}
-
-// Attempt to join the IRC channel
-sendln("JOIN ${chan}");
-
-// Message the channel
-msgChannel(chan, "Hello ${chan}");
-
-// Leave IRC
-sendln("QUIT");
-
-// Close I/O
-bWriter.close();
-bReader.clone();
-socket.close();
-
-/**************************************
- * All methods below
- */
 def divideTwo() {
 	try {
 		first = received.split(" :", 2)[0];
@@ -166,6 +88,88 @@ def msgChannel(chan, msg) {
 	}
 	logger.info("Sent:\tmessage: \"${msg}\" to channel ${chan}");
 }
+
+try {
+	socket = new Socket(server, port)
+} catch (IOException ex) {
+	logger.info("Failed to connect to ${server} on ${port}");
+	socket.close();
+	System.exit(-1);
+} catch (UnknownHostException ex) {
+	logger.info("Host ${server} not known");
+	socket.close();
+	System.exit(-1);
+}
+
+try {
+	//	bWriter =
+	//			new BufferedWriter(
+	//			new OutputStreamWriter(socket.getOutputStream()));
+
+	OutputStream sockOut = socket.getOutputStream();
+	OutputStreamWriter osw = new OutputStreamWriter(sockOut);
+	bWriter = new BufferedWriter(osw)
+
+
+	//	bReader = BufferedReader(
+	//			new InputStreamReader(socket.getInputStream()));
+
+	InputStream sockIn = socket.getInputStream();
+	InputStreamReader isr = new InputStreamReader(sockIn);
+	bReader = new BufferedReader(isr);
+
+	logger.info("Set up I/O streams with the server");
+	
+} catch(IOException ex) {
+	logger.info("Failed to get I/O streams with the server");
+	System.exit(-1);
+}
+
+//socket.withStreams { inStream, outStream ->
+//	def reader = inStream.newReader()
+//	def
+//}
+
+//TODO Make a separate thread for responding to pings?
+
+logger.info("Sending bot's nick to the server");
+
+sendln("Nick ${nick}");
+//XXX What does the 0 and * mean? What is the difference between 0 and 8?
+sendln("USER ${nick} 8 * :IRCBlit Service Hook for GitBlit");
+
+/**
+ * Wait for the server to respond with 001
+ * Before attempting to join a channel
+ * 
+ */
+while(( received = recieveln()) != null ) {
+	divideTwo();
+
+	if(first.equals("PING")) {
+		logger.info("Pinging server: ${last}");
+		sendln("PONG " + last);
+	}
+
+	if(first.contains("001")) {
+		logger.info("Received IRC Code 001");
+		break;
+	}
+}
+
+// Attempt to join the IRC channel
+sendln("JOIN ${chan}");
+
+// Message the channel
+msgChannel(chan, "Hello ${chan}");
+
+// Leave IRC
+sendln("QUIT");
+
+// Close I/O
+bWriter.close();
+bReader.clone();
+socket.close();
 
 
 
