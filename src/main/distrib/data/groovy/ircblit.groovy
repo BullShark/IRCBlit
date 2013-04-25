@@ -86,7 +86,7 @@ class IRCBlit {
 								sendln("PONG " + last);
 							} else if(first.contains("001")) {
 								received001 = true;
-							}// else if(received.contains("JOIN :${channel}")) {
+							}// else if(received.contains("JOIN :${chan}")) {
 //								joined = true;
 //							}
 						}
@@ -226,7 +226,7 @@ class IRCBlit {
 	def waitForChannelJoined() {
 		while(true) {
 			if(joined) {
-				logger.info("Channel joined: ${channel}");
+				logger.info("Channel joined: ${chan}");
 				break;
 			}
 			Thread.sleep(pollTime);
