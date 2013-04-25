@@ -72,28 +72,7 @@ class IRCBlit {
 		initialize(logger);
 		createIRCSocket();
 		createIOStreams();
-
-		//TODO Move to its own method
-		receivedT = new Thread() {
-
-					public void run() {
-						logger.info("Thread started: ${receivedT}");
-						//TODO Can we remove the assigning since receiveln() already does that?
-						while(( received = recieveln()) != null ) {
-							divideTwo();
-
-							if(first.equals("PING")) {
-								sendln("PONG " + last);
-							} else if(first.contains("001")) {
-								received001 = true;
-							} else if(received.contains("JOIN :${chan}")) {
-								joined = true;
-							}
-						}
-					}
-				};
-		receivedT.start();
-
+		createReceivedThread()
 		sendNickAndUserMessages();
 		waitFor001();
 		joinChannel();
@@ -164,8 +143,29 @@ class IRCBlit {
 		}
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	def createReceivedThread() {
-		//TODO Move code here when it's working
+		receivedT = new Thread() {
+					public void run() {
+						logger.info("Thread started: ${receivedT}");
+						//TODO Can we remove the assigning since receiveln() already does that?
+						while(( received = recieveln()) != null ) {
+							divideTwo();
+
+							if(first.equals("PING")) {
+								sendln("PONG " + last);
+							} else if(first.contains("001")) {
+								received001 = true;
+							} else if(received.contains("JOIN :${chan}")) {
+								joined = true;
+							}
+						}
+					}
+				};
+		receivedT.start();
 	}
 
 	/**
