@@ -46,7 +46,7 @@ class IRCBlit {
 	// Create variables
 	def server;
 	def port;
-	def channel;
+	def chan;
 	def nick;
 	def received;
 	def first;
@@ -67,7 +67,7 @@ class IRCBlit {
 		waitFor001();
 		sendNickAndUserMessages();
 		joinChannel();
-		// Send a test message the channel
+		// Send a test message the chan
 		msgChannel(chan, "Hello ${chan}");
 		quitAndCloseStreams();
 	}
@@ -79,7 +79,7 @@ class IRCBlit {
 	def initialize(logger) {
 		server = "frequency.windfyre.net";
 		port = 6667;
-		channel = "#blackhats";
+		chan = "#blackhats";
 		nick = "GitBlit";
 		received = "";
 		first = "";
@@ -146,8 +146,8 @@ class IRCBlit {
 	}
 
 	def joinChannel() {
-		// Attempt to join the IRC channel
-		sendln("JOIN ${channel}");
+		// Attempt to join the IRC chan
+		sendln("JOIN ${chan}");
 	}
 
 	/**
@@ -166,7 +166,7 @@ class IRCBlit {
 
 	/**
 	 * Wait for the server to respond with 001
-	 * Before attempting to join a channel
+	 * Before attempting to join a chan
 	 * @return
 	 */
 	def waitFor001() {
@@ -221,9 +221,9 @@ class IRCBlit {
 	 */
 	def msgChannel(chan, msg) {
 		if( !sendln("PRIVMSG " + chan + " :" + msg) ) {
-			logger.info("Failed to send message: \"${msg}\" to channel ${chan}");
+			logger.info("Failed to send message: \"${msg}\" to chan ${chan}");
 		}
-		logger.info("Sent:\tmessage: \"${msg}\" to channel ${chan}");
+		logger.info("Sent:\tmessage: \"${msg}\" to chan ${chan}");
 	}
 
 	/**
