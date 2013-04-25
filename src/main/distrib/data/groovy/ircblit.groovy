@@ -69,8 +69,17 @@ try {
 			new BufferedWriter(
 			new OutputStreamWriter(socket.getOutputStream()));
 
-	breader = BufferedReader(
-			new InputStreamReader(socket.getInputStream()));
+//	breader = BufferedReader(
+//			new InputStreamReader(socket.getInputStream()));
+		
+		InputStream sockIn = socket.getInputStream();
+		InputStreamReader isr = new InputStreamReader(sockIn);
+		breader = new BufferedReader(isr);
+		
+//		InputStream stdin = proc.getInputStream();
+//		InputStreamReader isr = new InputStreamReader(stdin);
+//		BufferedReader br = new BufferedReader(isr);
+		
 	
 } catch(IOException ex) {
 	logger.info("Failed to get I/O streams with the server");
