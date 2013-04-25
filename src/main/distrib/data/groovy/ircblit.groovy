@@ -77,8 +77,6 @@ class IRCBlit {
 					public void run() {
 						logger.info("receivedT thread started");
 						//TODO Can we remove the assigning since receiveln() already does that?
-//						def received001 = false;
-						//TODO
 						while(( received = recieveln()) != null ) {
 							divideTwo();
 
