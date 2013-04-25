@@ -81,6 +81,7 @@ class IRCBlit {
 						def received001 = false;
 						//TODO
 						while(( received = recieveln()) != null ) {
+							logger.info("received: ${received}");
 							divideTwo();
 
 							if(first.equals("PING")) {
