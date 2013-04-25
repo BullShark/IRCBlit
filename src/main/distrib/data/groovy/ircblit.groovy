@@ -67,22 +67,22 @@ try {
 }
 
 try {
-//	bWriter =
-//			new BufferedWriter(
-//			new OutputStreamWriter(socket.getOutputStream()));
-	
+	//	bWriter =
+	//			new BufferedWriter(
+	//			new OutputStreamWriter(socket.getOutputStream()));
+
 	OutputStream sockOut = socket.getOutputStream();
 	OutputStreamWriter osw = new OutputStreamWriter(sockOut);
 	bWriter = new BufferedWriter(osw)
 
 
-//	bReader = BufferedReader(
-//			new InputStreamReader(socket.getInputStream()));
-		
-		InputStream sockIn = socket.getInputStream();
-		InputStreamReader isr = new InputStreamReader(sockIn);
-		bReader = new BufferedReader(isr);
-	
+	//	bReader = BufferedReader(
+	//			new InputStreamReader(socket.getInputStream()));
+
+	InputStream sockIn = socket.getInputStream();
+	InputStreamReader isr = new InputStreamReader(sockIn);
+	bReader = new BufferedReader(isr);
+
 } catch(IOException ex) {
 	logger.info("Failed to get I/O streams with the server");
 	System.exit(-1);
