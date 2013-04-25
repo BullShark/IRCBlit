@@ -86,9 +86,9 @@ class IRCBlit {
 								sendln("PONG " + last);
 							} else if(first.contains("001")) {
 								received001 = true;
-							} else if(received.contains("JOIN :${channel}")) {
-								joined = true;
-							}
+							}// else if(received.contains("JOIN :${channel}")) {
+//								joined = true;
+//							}
 						}
 					}
 				};
@@ -121,7 +121,8 @@ class IRCBlit {
 		this.logger = logger;
 		pollTime = 500; // Time in ms between checks for server messages
 		received001 = false;
-		joined = false;
+//		joined = false;
+		joined = true;
 	}
 
 	/**
