@@ -295,7 +295,7 @@ class IRCBlit {
 
 		// Close I/O
 		bWriter.close();
-		bReader.clone();
+		bReader.close();
 		socket.close();
 		logger.info("Closed all I/O streams");
 	}
