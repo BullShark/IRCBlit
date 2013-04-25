@@ -289,7 +289,7 @@ class IRCBlit {
 	 * @param msg Notice to be sent to the channel
 	 * @return
 	 */
-	noticeChannel(chan, msg) {
+	def noticeChannel(chan, msg) {
 		if( !sendln("NOTICE " + chan + " :" + msg) ) {
 			logger.info("Failed to send notice: \"${msg}\" to chan ${chan}");
 		}
