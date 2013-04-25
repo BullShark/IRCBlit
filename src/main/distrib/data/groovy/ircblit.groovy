@@ -72,13 +72,14 @@ class IRCBlit {
 		createIOStreams();
 
 		receivedT = new Thread() {
-			logger.info("receivedT thread started");
+
 					def received001 = false;
-					
+
 					public void run() {
+						logger.info("receivedT thread started");
 						//TODO Can we remove the assigning since receiveln() already does that?
 						def received001 = false;
-						//TODO 
+						//TODO
 						while(( received = recieveln()) != null ) {
 							divideTwo();
 
@@ -96,7 +97,7 @@ class IRCBlit {
 						return received001;
 					}
 				};
-			receivedT.start();
+		receivedT.start();
 
 		waitFor001();
 		sendNickAndUserMessages();
@@ -122,7 +123,7 @@ class IRCBlit {
 		bWriter = null;
 		bReader = null;
 		this.logger = logger;
-		pollTime = 500; // Time in ms between checks for 001 welcome message 
+		pollTime = 500; // Time in ms between checks for 001 welcome message
 	}
 
 	/**
@@ -219,7 +220,7 @@ class IRCBlit {
 		//				break;
 		//			}
 		//		}
-		
+
 		//TODO Add timer that breaks this loop after X seconds if the message wasn't received?
 		while(true) {
 			if(receivedT.receivedWelcomeCode()) {
