@@ -1,5 +1,6 @@
 //package expectusafterlun.ch.irc;
 
+//TODO Organize imports
 import com.gitblit.GitBlit;
 import com.gitblit.Keys;
 import com.gitblit.models.RepositoryModel;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 
 import sun.org.mozilla.javascript.tools.shell.QuitAction;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -73,6 +73,7 @@ class IRCBlit {
 		createIRCSocket();
 		createIOStreams();
 
+		//TODO Move to its own method
 		receivedT = new Thread() {
 
 					public void run() {
@@ -103,7 +104,7 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
+	 * Gives all the global variables default values
 	 * @return
 	 */
 	def initialize(logger) {
@@ -118,13 +119,13 @@ class IRCBlit {
 		bWriter = null;
 		bReader = null;
 		this.logger = logger;
-		pollTime = 500; // Time in ms between checks for 001 welcome message
+		pollTime = 500; // Time in ms between checks for server messages
 		received001 = false;
 		joined = false;
 	}
 
 	/**
-	 * 
+	 * Attempts to create the socket connection to the IRC server on a specified port
 	 * @return
 	 */
 	def createIRCSocket() {
@@ -143,37 +144,33 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
+	 * Attempts to get streams for reading and writing to the server connection
 	 * @return
 	 */
 	def createIOStreams() {
 		try {
-			//	bWriter =
-			//			new BufferedWriter(
-			//			new OutputStreamWriter(socket.getOutputStream()));
-
 			OutputStream sockOut = socket.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(sockOut);
 			bWriter = new BufferedWriter(osw)
-
-
-			//	bReader = BufferedReader(
-			//			new InputStreamReader(socket.getInputStream()));
 
 			InputStream sockIn = socket.getInputStream();
 			InputStreamReader isr = new InputStreamReader(sockIn);
 			bReader = new BufferedReader(isr);
 
 			logger.info("Set up I/O streams with the server");
-
 		} catch(IOException ex) {
 			logger.info("Failed to get I/O streams with the server");
 			System.exit(-1);
 		}
 	}
+	
+	def createReceivedThread() {
+		//TODO Move code here when it's working
+	}
 
 	/**
-	 * 
+	 * Sends the NICK line with the nick to be used
+	 * And the USER line with identd and real name
 	 * @return
 	 */
 	def sendNickAndUserMessages() {
