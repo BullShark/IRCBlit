@@ -54,6 +54,7 @@ class IRCBlit {
 	def received;
 	def first;
 	def last;
+	//TODO When this script is working, change all to def and test if it still works
 	Socket socket;
 	BufferedWriter bWriter;
 	BufferedReader bReader;
@@ -76,6 +77,7 @@ class IRCBlit {
 					public void run() {
 						//TODO Can we remove the assigning since receiveln() already does that?
 						def received001 = false;
+						//TODO 
 						while(( received = recieveln()) != null ) {
 							divideTwo();
 
@@ -219,6 +221,7 @@ class IRCBlit {
 		//TODO Add timer that breaks this loop after X seconds if the message wasn't received?
 		while(true) {
 			if(receivedT.receivedWelcomeCode()) {
+				logger.info("Breaking the wait for 001 loop");
 				break;
 			}
 			Thread.sleep(pollTime);
