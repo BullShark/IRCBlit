@@ -147,7 +147,7 @@ class IRCBlit {
 
 	def joinChannel() {
 		// Attempt to join the IRC channel
-		sendln("JOIN ${chan}");
+		sendln("JOIN ${channel}");
 	}
 
 	/**
