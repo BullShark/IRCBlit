@@ -128,6 +128,7 @@ class IRCBlit {
 	 */
 	def createIRCSocket() {
 		try {
+			//TODO Support SSL
 			socket = new Socket(server, port)
 		} catch (IOException ex) {
 			logger.info("Failed to connect to ${server} on ${port}");
