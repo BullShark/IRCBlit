@@ -235,7 +235,7 @@ class IRCBlit {
 	}
 }
 
-new IRCBlit();
+new IRCBlit(logger);
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
