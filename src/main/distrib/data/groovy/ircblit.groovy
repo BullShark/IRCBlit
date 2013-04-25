@@ -205,7 +205,7 @@ class IRCBlit {
 	def String recieveln() {
 		try {
 			received = bReader.readLine();
-			logger.info("Received:\t${line}");
+			logger.info("Received:\t${received}");
 			return received;
 		} catch (IOException ex) {
 			logger.info("Failed to get I/O streams with the server");
