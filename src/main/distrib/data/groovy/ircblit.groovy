@@ -72,7 +72,7 @@ class IRCBlit {
 		createIRCSocket();
 		createIOStreams();
 
-		receivedT = Thread.start() {
+		receivedT = new Thread() {
 
 					public void run() {
 						logger.info("receivedT thread started");
