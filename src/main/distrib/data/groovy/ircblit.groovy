@@ -12,6 +12,8 @@ import org.eclipse.jgit.transport.ReceiveCommand.Result;
 import java.io.BufferedReader;
 import org.slf4j.Logger;
 
+import sun.org.mozilla.javascript.tools.shell.QuitAction;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -192,6 +194,10 @@ class IRCBlit {
 	 * @return
 	 */
 	def sendln(line) {
+		if(socket == null || bWriter == null) {
+			logger.info("No connection to the server, exiting");
+			quitAndCloseStreams(false);
+		}
 		bWriter.write(line);
 		bWriter.newLine();
 		bWriter.flush();
@@ -230,14 +236,25 @@ class IRCBlit {
 	 * 
 	 * @return
 	 */
-	def quitAndCloseStreams() {
+	def quitAndCloseStreams(sendQuit) {
 		// Leave IRC
-		sendln("QUIT");
+		if(sendQuit) {
+			sendln("QUIT");
+		}
 
 		// Close I/O
 		bWriter.close();
 		bReader.clone();
 		socket.close();
+	}
+	
+	/**
+	 * Wrapper class to quitAndCloseStreams(boolean sendQuit)
+	 * Defaults to sending QUIT to the IRC server
+	 * @return
+	 */
+	def quitAndCloseStreams() {
+		quitAndCloseStreams(true);
 	}
 }
 
