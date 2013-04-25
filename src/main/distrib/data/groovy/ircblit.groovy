@@ -72,12 +72,12 @@ class IRCBlit {
 		createIRCSocket();
 		createIOStreams();
 
-		receivedT = new Thread() {
+		receivedT = Thread.start() {
 
 					public void run() {
 						logger.info("receivedT thread started");
 						//TODO Can we remove the assigning since receiveln() already does that?
-						def received001 = false;
+//						def received001 = false;
 						//TODO
 						while(( received = recieveln()) != null ) {
 							divideTwo();
