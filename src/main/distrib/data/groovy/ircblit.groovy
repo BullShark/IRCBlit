@@ -57,6 +57,7 @@ class IRCBlit {
 	BufferedWriter bWriter;
 	BufferedReader bReader;
 	def logger;
+	Thread pingT;
 
 	/**
 	 * 
@@ -67,6 +68,21 @@ class IRCBlit {
 		createIRCSocket();
 		createIOStreams();
 		waitFor001();
+
+		pingT = new Thread() {
+					public void run() {
+						//TODO Can we remove the assigning since receiveln() already does that?
+						while(( received = recieveln()) != null ) {
+							divideTwo();
+
+							if(first.equals("PING")) {
+								logger.info("Pinging server: ${last}");
+								sendln("PONG " + last);
+							}
+						}
+					}
+				};
+
 		sendNickAndUserMessages();
 		joinChannel();
 		// Send a test message the chan
@@ -205,7 +221,7 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
+	 * TODO Set return type to void and remove all received = receiveln() code
 	 * @return
 	 */
 	def String recieveln() {
@@ -229,6 +245,7 @@ class IRCBlit {
 		if( !sendln("PRIVMSG " + chan + " :" + msg) ) {
 			logger.info("Failed to send message: \"${msg}\" to chan ${chan}");
 		}
+		//TODO Redundant?
 		logger.info("Sent:\tmessage: \"${msg}\" to chan ${chan}");
 	}
 
@@ -242,12 +259,15 @@ class IRCBlit {
 			sendln("QUIT");
 		}
 
+		// Kill Ping Thread
+
 		// Close I/O
 		bWriter.close();
 		bReader.clone();
 		socket.close();
+		logger.info("Closed all I/O streams");
 	}
-	
+
 	/**
 	 * Wrapper class to quitAndCloseStreams(boolean sendQuit)
 	 * Defaults to sending QUIT to the IRC server
