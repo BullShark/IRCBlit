@@ -53,9 +53,10 @@ class IRCBlit {
 	Socket socket;
 	BufferedWriter bWriter;
 	BufferedReader bReader;
+	def logger;
 
-	IRCBlit() {
-		initialize();
+	IRCBlit(logger) {
+		initialize(logger);
 		createIRCSocket();
 		createIOStreams();
 		waitFor001();
@@ -70,7 +71,7 @@ class IRCBlit {
 	 * 
 	 * @return
 	 */
-	def initialize() {
+	def initialize(logger) {
 		server = "frequency.windfyre.net";
 		port = 6667;
 		channel = "#blackhats";
@@ -80,6 +81,7 @@ class IRCBlit {
 		socket = null;
 		bWriter = null;
 		bReader = null;
+		this.logger = logger;
 	}
 
 	/**
