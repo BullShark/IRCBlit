@@ -62,6 +62,7 @@ class IRCBlit {
 	Thread receivedT;
 	def pollTime;
 	def received001;
+	def joined;
 
 	/**
 	 * 
@@ -81,22 +82,21 @@ class IRCBlit {
 							divideTwo();
 
 							if(first.equals("PING")) {
-								logger.info("Pinging server: ${last}");
 								sendln("PONG " + last);
-							}
-							if(first.contains("001")) {
-								logger.info("Received IRC Code 001");
+							} else if(first.contains("001")) {
 								received001 = true;
+							} else if(received.contains("JOIN :${channel}")) {
+								joined = true;
 							}
 						}
 					}
 				};
 		receivedT.start();
-		
+
 		sendNickAndUserMessages();
 		waitFor001();
-
 		joinChannel();
+		waitForChannelJoined();
 		// Send a test message the chan
 		msgChannel(chan, "Hello ${chan}");
 		quitAndCloseStreams();
@@ -120,6 +120,7 @@ class IRCBlit {
 		this.logger = logger;
 		pollTime = 500; // Time in ms between checks for 001 welcome message
 		received001 = false;
+		joined = false;
 	}
 
 	/**
@@ -203,22 +204,6 @@ class IRCBlit {
 	 * @return
 	 */
 	def waitFor001() {
-
-		//		while(( received = recieveln()) != null ) {
-		//			divideTwo();
-		//
-		//			if(first.equals("PING")) {
-		//				logger.info("Pinging server: ${last}");
-		//				sendln("PONG " + last);
-		//			}
-		//
-		//			if(first.contains("001")) {
-		//				logger.info("Received IRC Code 001");
-		//				break;
-		//			}
-		//		}
-
-		//TODO Add timer that breaks this loop after X seconds if the message wasn't received?
 		while(true) {
 			if(received001) {
 				logger.info("Breaking the wait for 001 loop");
@@ -226,7 +211,16 @@ class IRCBlit {
 			}
 			Thread.sleep(pollTime);
 		}
-		logger.info("Broke loop, exiting waitFor001");
+	}
+	
+	def waitForChannelJoined() {
+		while(true) {
+			if(joined) {
+				logger.info("Channel joined: ${channel}");
+				break;
+			}
+			Thread.sleep(pollTime);
+		}
 	}
 
 	/**
@@ -274,8 +268,6 @@ class IRCBlit {
 		if( !sendln("PRIVMSG " + chan + " :" + msg) ) {
 			logger.info("Failed to send message: \"${msg}\" to chan ${chan}");
 		}
-		//TODO Redundant?
-		logger.info("Sent:\tmessage: \"${msg}\" to chan ${chan}");
 	}
 
 	/**
@@ -288,7 +280,7 @@ class IRCBlit {
 			sendln("QUIT");
 		}
 
-		// Kill Ping Thread TODO
+		// TODO Kill Received Thread
 
 		// Close I/O
 		bWriter.close();
