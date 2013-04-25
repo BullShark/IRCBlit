@@ -99,9 +99,10 @@ class IRCBlit {
 					}
 				};
 		receivedT.start();
-
-		waitFor001();
+		
 		sendNickAndUserMessages();
+		waitFor001();
+
 		joinChannel();
 		// Send a test message the chan
 		msgChannel(chan, "Hello ${chan}");
