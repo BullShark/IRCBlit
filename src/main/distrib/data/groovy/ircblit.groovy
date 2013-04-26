@@ -301,7 +301,7 @@ class IRCBlit {
 	}
 
 	/**
-	 * TODO Set return type to void and remove all received = receiveln() code
+	 * 
 	 * @return
 	 */
 	def boolean receiveln() {
@@ -381,5 +381,3 @@ new IRCBlit(logger);
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
-//TODO Make a separate thread for responding to pings?
-//XXX What does the 0 and * mean? What is the difference between 0 and 8?
