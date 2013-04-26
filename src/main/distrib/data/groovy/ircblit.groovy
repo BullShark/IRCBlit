@@ -158,7 +158,7 @@ class IRCBlit {
 					public void run() {
 						logger.info("Thread started: ${receivedT}");
 						//TODO Can we remove the assigning since receiveln() already does that?
-						while(( received = recieveln()) != null ) {
+						while(receiveln()) {
 							divideTwo();
 
 							if(first.equals("PING")) {
@@ -262,14 +262,18 @@ class IRCBlit {
 	 * TODO Set return type to void and remove all received = receiveln() code
 	 * @return
 	 */
-	def String recieveln() {
+	def boolean receiveln() {
 		try {
 			received = bReader.readLine();
 			logger.info("Received:\t${received}");
-			return received;
+			if(received == null) {
+				return false;
+			} else {
+				return true;
+			}		
 		} catch (IOException ex) {
 			logger.info("Failed to get I/O streams with the server");
-			return null;
+			return false;
 		}
 	}
 
@@ -285,7 +289,6 @@ class IRCBlit {
 		}
 	}
 	
-
 	/**
 	 * Sends a notice to a channel
 	 * @param chan Channel to send the notice to
