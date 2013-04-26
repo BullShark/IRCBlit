@@ -78,9 +78,9 @@ class IRCBlit {
 		joinChannel();
 		waitForChannelJoined();
 		// Send a test message to the chan
-		msgChannel(chan, "Hello ${chan}");
+		msgChannel(chan, ".wr");
 		// Send a test notice to the chan
-		noticeChannel(chan, "c|c is a n00b!")
+		noticeChannel(chan, "Hello ${chan}")
 		quitAndCloseStreams();
 	}
 
