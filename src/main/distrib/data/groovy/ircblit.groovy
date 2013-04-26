@@ -93,7 +93,8 @@ class IRCBlit {
 		waitForChannelJoined();
 		gitBlitChannel();
 		// Send a test message to the chan
-		//		msgChannel(chan, ".wr");
+		msgChannel(chan, ".wr");
+		msgChannel(chan, "ftl");
 		// Send a test notice to the chan
 		noticeChannel(chan, "Hello ${chan}");
 		gitBlitChannel();
