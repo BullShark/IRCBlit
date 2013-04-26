@@ -46,7 +46,7 @@ import java.net.SocketException;
 logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}");
 
 class IRCBlit {
-	// Create variables
+	// Create global variables
 	def server;
 	def port;
 	def chan;
@@ -54,19 +54,19 @@ class IRCBlit {
 	def received;
 	def first;
 	def last;
-	//TODO When this script is working, change all to def and test if it still works
-	Socket socket;
-	BufferedWriter bWriter;
-	BufferedReader bReader;
+	def socket;
+	def bWriter;
+	def bReader;
 	def logger;
-	Thread receivedT;
+	def receivedT;
 	def pollTime;
 	def received001;
 	def joined;
 
 	/**
-	 * 
-	 * @param logger
+	 * The constructor calls many helper methods
+	 * From setting up the irc connection to closing the connection
+	 * @param logger Used for logging info messages to Apache Tomcat's server logs
 	 */
 	IRCBlit(logger) {
 		initialize(logger);
