@@ -110,8 +110,6 @@ class IRCBlit {
 		port = 6667;
 		chan = "#blackhats";
 		nick = "GitBlit";
-		//identd = ""
-		//realName = ""
 		received = "";
 		first = "";
 		last = "";
