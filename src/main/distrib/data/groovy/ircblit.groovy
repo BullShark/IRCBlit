@@ -257,7 +257,7 @@ class IRCBlit {
 	/**
 	 * 
 	 */
-	gitBlitChannel() {
+	def gitBlitChannel() {
 	/*
 	 * Produce similar messages to these here in this method:
 	 * 
