@@ -257,7 +257,8 @@ class IRCBlit {
 	 * @param line The line to send to the server
 	 * @return
 	 */
-	def sendln(line) {
+	def boolean sendln(line) {
+		def sent = false;
 		try {
 			if(socket == null || bWriter == null) {
 				throw new SocketException("Socket or ouptut stream is null");
@@ -266,9 +267,11 @@ class IRCBlit {
 			bWriter.newLine();
 			bWriter.flush();
 			logger.info("Sent:\t${line}");
+			return sent;
 		} catch (SocketException ex) {
 			logger.info("No connection to the server, exiting");
 			quitAndCloseStreams(false);
+			return sent;
 		}
 	}
 
