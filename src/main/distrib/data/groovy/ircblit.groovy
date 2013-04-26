@@ -93,6 +93,8 @@ class IRCBlit {
 		port = 6667;
 		chan = "#blackhats";
 		nick = "GitBlit";
+		//identd = ""
+		//realName = ""
 		received = "";
 		first = "";
 		last = "";
@@ -103,6 +105,7 @@ class IRCBlit {
 		pollTime = 500; // Time in ms between checks for server messages
 		received001 = false;
 		joined = false;
+		//quitMsg = "GitBlit Service Hook by BullShark"
 	}
 
 	/**
