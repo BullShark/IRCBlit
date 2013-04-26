@@ -91,10 +91,12 @@ class IRCBlit {
 		waitFor001();
 		joinChannel();
 		waitForChannelJoined();
+		gitBlitChannel();
 		// Send a test message to the chan
-		msgChannel(chan, ".wr");
+//		msgChannel(chan, ".wr");
 		// Send a test notice to the chan
-		noticeChannel(chan, "Hello ${chan}")
+		noticeChannel(chan, "Hello ${chan}");
+		gitBlitChannel();
 		quitAndCloseStreams();
 	}
 
@@ -253,6 +255,29 @@ class IRCBlit {
 	}
 
 	/**
+	 * 
+	 */
+	gitBlitChannel() {
+	/*
+	 * Produce similar messages to these here in this method:
+	 * 
+--> | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
+    | joined #blackhats                                               
+ -- | Mode #blackhats [+v GitHubbed] by BHBot                         
+ -- | Notice(GitHubbed): [JRobo] BullShark pushed 2 new commits to    
+    | master: http://git.io/JthFbQ                                    
+ -- | Notice(GitHubbed): JRobo/master b2ca398 BullShark: lol          
+ -- | Notice(GitHubbed): JRobo/master 919dab3 BullShark: Attempting to
+    | fix bug preventing wr not working and failure to respond to ping
+    | while getUsers() is being called                                
+<-- | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
+    | left #blackhats
+     *                                                 
+	 */
+
+	}
+	
+	/**
 	 * Sends a raw line to the irc server
 	 * @param line The line to send to the server
 	 * @return
@@ -332,7 +357,7 @@ class IRCBlit {
 			sendln("QUIT");
 		}
 
-		// TODO Kill Received Thread
+		//TODO Kill Received Thread
 		//receivedT
 
 		// Close I/O
