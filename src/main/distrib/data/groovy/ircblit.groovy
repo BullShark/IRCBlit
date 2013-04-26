@@ -93,7 +93,7 @@ class IRCBlit {
 		waitForChannelJoined();
 		gitBlitChannel();
 		// Send a test message to the chan
-//		msgChannel(chan, ".wr");
+		//		msgChannel(chan, ".wr");
 		// Send a test notice to the chan
 		noticeChannel(chan, "Hello ${chan}");
 		gitBlitChannel();
@@ -258,25 +258,25 @@ class IRCBlit {
 	 * 
 	 */
 	def gitBlitChannel() {
-	/*
-	 * Produce similar messages to these here in this method:
-	 * 
---> | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
-    | joined #blackhats                                               
- -- | Mode #blackhats [+v GitHubbed] by BHBot                         
- -- | Notice(GitHubbed): [JRobo] BullShark pushed 2 new commits to    
-    | master: http://git.io/JthFbQ                                    
- -- | Notice(GitHubbed): JRobo/master b2ca398 BullShark: lol          
- -- | Notice(GitHubbed): JRobo/master 919dab3 BullShark: Attempting to
-    | fix bug preventing wr not working and failure to respond to ping
-    | while getUsers() is being called                                
-<-- | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
-    | left #blackhats
-     *                                                 
-	 */
+		/*
+		 * Produce similar messages to these here in this method:
+		 * 
+		 --> | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
+		 | joined #blackhats                                               
+		 -- | Mode #blackhats [+v GitHubbed] by BHBot                         
+		 -- | Notice(GitHubbed): [JRobo] BullShark pushed 2 new commits to    
+		 | master: http://git.io/JthFbQ                                    
+		 -- | Notice(GitHubbed): JRobo/master b2ca398 BullShark: lol          
+		 -- | Notice(GitHubbed): JRobo/master 919dab3 BullShark: Attempting to
+		 | fix bug preventing wr not working and failure to respond to ping
+		 | while getUsers() is being called                                
+		 <-- | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
+		 | left #blackhats
+		 *                                                 
+		 */
 
 	}
-	
+
 	/**
 	 * Sends a raw line to the irc server
 	 * @param line The line to send to the server
@@ -301,8 +301,8 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Attempt to receive a line from the server connection
+	 * @return True if a line was received, false otherwise
 	 */
 	def boolean receiveln() {
 		try {
@@ -312,7 +312,7 @@ class IRCBlit {
 				return false;
 			} else {
 				return true;
-			}		
+			}
 		} catch (IOException ex) {
 			logger.info("Failed to get I/O streams with the server");
 			return false;
@@ -330,7 +330,7 @@ class IRCBlit {
 			logger.info("Failed to send message: \"${msg}\" to chan ${chan}");
 		}
 	}
-	
+
 	/**
 	 * Sends a notice to a channel
 	 * @param chan Channel to send the notice to
@@ -342,7 +342,7 @@ class IRCBlit {
 			logger.info("Failed to send notice: \"${msg}\" to chan ${chan}");
 		}
 	}
-	
+
 	/**
 	 * Closes all the I/O streams,
 	 * Stops the received thread if it is still running
