@@ -296,14 +296,17 @@ class IRCBlit {
 	}
 	
 	/**
-	 * 
-	 * @param sendQuit
+	 * Closes all the I/O streams,
+	 * Stops the received thread if it is still running
+	 * And optionall sends a QUIT message to the server
+	 * Optionally because the streams might already be null and writing to them would fail
+	 * @param sendQuit Whether to send QUIT to servers input connection stream
 	 * @return
 	 */
 	def quitAndCloseStreams(sendQuit) {
 		// Leave IRC
 		if(sendQuit) {
-			sendln("QUIT :GitBlit Service Hook by BullShark");
+			sendln("QUIT");
 		}
 
 		// TODO Kill Received Thread
