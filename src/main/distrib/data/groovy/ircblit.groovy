@@ -296,6 +296,7 @@ class IRCBlit {
 			bWriter.write(line);
 			bWriter.newLine();
 			bWriter.flush();
+			sent = true;
 			logger.info("Sent:\t${line}");
 			return sent;
 		} catch (SocketException ex) {
