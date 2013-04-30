@@ -388,3 +388,4 @@ new IRCBlit(logger);
 //TODO And if the fields do not exist, use some defaults
 //TODO Organize imports
 //TODO Support SSL
+//TODO Add debug variable for suppressing irc messages when it is set to false
