@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-//TODO Organize imports
 import com.gitblit.GitBlit;
 import com.gitblit.Keys;
 import com.gitblit.models.RepositoryModel;
@@ -129,7 +128,6 @@ class IRCBlit {
 	 */
 	def createIRCSocket() {
 		try {
-			//TODO Support SSL
 			socket = new Socket(server, port)
 		} catch (IOException ex) {
 			logger.info("Failed to connect to ${server} on ${port}");
@@ -172,7 +170,6 @@ class IRCBlit {
 		receivedT = new Thread() {
 					public void run() {
 						logger.info("Thread started: ${receivedT}");
-						//TODO Can we remove the assigning since receiveln() already does that?
 						while(receiveln()) {
 							divideTwo();
 
@@ -210,7 +207,7 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
+	 * Splits a line received by the irc connection into two parts
 	 * @return
 	 */
 	def divideTwo() {
@@ -274,6 +271,15 @@ class IRCBlit {
 		 *                                                 
 		 */
 
+		/*
+		 * IRC message formatting. For reference:
+		 * \002 bold \003 color \017 reset \026 italic/reverse \037 underline
+		 * 0 white 1 black 2 dark blue 3 dark green
+		 * 4 dark red 5 brownish 6 dark purple 7 orange
+		 * 8 yellow 9 light green 10 dark teal 11 light teal
+		 * 12 light blue 13 light purple 14 dark gray 15 light gray
+		 */
+		
 	}
 
 	/**
@@ -380,3 +386,5 @@ new IRCBlit(logger);
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
+//TODO Organize imports
+//TODO Support SSL
