@@ -58,9 +58,15 @@ import java.net.SocketException;
  *   def myCustomField = repository.customFields.myCustomField
  */
 
+com.gitblit.models.UserModel userModel = user
+
 // Indicate we have started the script
 logger.info("IRCBlit hook triggered by ${user.username} for ${repository.name}");
 
+//Repository r = gitblit.getRepository(repository.name)
+
+// reuse existing repository config settings, if available
+//Config config = r.getConfig()
 // define the summary and commit urls
 def repo = repository.name
 def summaryUrl = url + "/summary?r=$repo"
@@ -96,34 +102,10 @@ class IRCBlit {
 	def joined;
 
 	/**
-	 * The constructor calls many helper methods
-	 * From setting up the irc connection to closing the connection
-	 * @param logger Used for logging info messages to Apache Tomcat's server logs
+	 * Gives all the global variables default values
+	 * @param logger
 	 */
 	IRCBlit(logger) {
-		initialize(logger);
-		createIRCSocket();
-		createIOStreams();
-		createReceivedThread()
-		sendNickAndUserMessages();
-		waitFor001();
-		joinChannel();
-		waitForChannelJoined();
-		gitBlitChannel();
-		// Send a test message to the chan
-		msgChannel(chan, ".wr");
-		msgChannel(chan, "ftl");
-		// Send a test notice to the chan
-		noticeChannel(chan, "Hello ${chan}");
-		gitBlitChannel();
-		quitAndCloseStreams();
-	}
-
-	/**
-	 * Gives all the global variables default values
-	 * @return
-	 */
-	def initialize(logger) {
 		server = "frequency.windfyre.net";
 		port = 6667;
 		chan = "#blackhats";
@@ -139,6 +121,29 @@ class IRCBlit {
 		received001 = false;
 		joined = false;
 		//quitMsg = "GitBlit Service Hook by BullShark"
+	}
+
+	/**
+	 * The constructor calls many helper methods
+	 * From setting up the irc connection to closing the connection
+	 * @param logger Used for logging info messages to Apache Tomcat's server logs
+	 */
+	def start(content) {
+		createIRCSocket();
+		createIOStreams();
+		createReceivedThread()
+		sendNickAndUserMessages();
+		waitFor001();
+		joinChannel();
+		waitForChannelJoined();
+		gitBlitChannel(content);
+		// Send a test message to the chan
+		msgChannel(chan, ".wr");
+		msgChannel(chan, "ftl");
+		// Send a test notice to the chan
+		noticeChannel(chan, "Hello ${chan}");
+		gitBlitChannel();
+		quitAndCloseStreams();
 	}
 
 	/**
@@ -272,7 +277,7 @@ class IRCBlit {
 	/**
 	 * 
 	 */
-	def gitBlitChannel() {
+	def gitBlitChannel(content) {
 		/*
 		 * Produce similar messages to these here in this method:
 		 * 
@@ -299,6 +304,7 @@ class IRCBlit {
 		 * 12 light blue 13 light purple 14 dark gray 15 light gray
 		 */
 
+		noticeChannel(chan, content);
 	}
 
 	/**
@@ -400,7 +406,7 @@ class IRCBlit {
 	def quitAndCloseStreams() {
 		quitAndCloseStreams(true);
 	}
-	
+
 	/*
 	 * Used for Git Summary Message
 	 */
@@ -739,7 +745,28 @@ class IRCBlit {
 	}
 }
 
-IRCBlit(logger);
+def IRCBlit = new IRCBlit(logger);
+IRCBlit.repository = r
+IRCBlit.baseCommitUrl = baseCommitUrl
+IRCBlit.baseBlobDiffUrl = baseBlobDiffUrl
+IRCBlit.baseCommitDiffUrl = baseCommitDiffUrl
+IRCBlit.forwardSlashChar = forwardSlashChar
+IRCBlit.commands = commands
+IRCBlit.url = url
+IRCBlit.mountParameters = GitBlit.getBoolean(Keys.web.mountParameters, true)
+IRCBlit.includeGravatar = GitBlit.getBoolean(Keys.web.allowGravatar, true)
+IRCBlit.shortCommitIdLength = GitBlit.getInteger(Keys.web.shortCommitIdLength, 8)
+
+IRCBlit.start(IRCBlit.write());
+
+// close the repository reference
+r.close()
+
+// tell Gitblit to send the message (Gitblit filters duplicate addresses)
+//def repositoryName = repository.name.substring(0, repository.name.length() - 4)
+//gitblit.sendHtmlMail("${emailprefix} ${userModel.displayName} pushed ${mailWriter.commitCount} commits => $repositoryName",
+//					 content,
+//					 toAddresses)
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
