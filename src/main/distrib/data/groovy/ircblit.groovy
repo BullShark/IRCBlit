@@ -83,8 +83,12 @@ class IRCBlit {
 	 */
 	IRCBlit(logger) {
 		initialize(logger);
-		createIRCSocket();
-		createIOStreams();
+		if(!createIRCSocket()) {
+			return;
+		}
+		if(!createIOStreams()) {
+			return;
+		}
 		createReceivedThread()
 		sendNickAndUserMessages();
 		waitFor001();
@@ -92,7 +96,6 @@ class IRCBlit {
 		waitForChannelJoined();
 		gitBlitChannel();
 		// Send a test message to the chan
-		msgChannel(chan, ".wr");
 		msgChannel(chan, "ftl");
 		// Send a test notice to the chan
 		noticeChannel(chan, "Hello ${chan}");
@@ -124,27 +127,28 @@ class IRCBlit {
 
 	/**
 	 * Attempts to create the socket connection to the IRC server on a specified port
-	 * @return
+	 * @return False if an exception occurred
 	 */
-	def createIRCSocket() {
+	def boolean createIRCSocket() {
 		try {
 			socket = new Socket(server, port)
 		} catch (IOException ex) {
 			logger.info("Failed to connect to ${server} on ${port}");
 			socket.close();
-			System.exit(-1);
+			return false;
 		} catch (UnknownHostException ex) {
 			logger.info("Host ${server} not known");
 			socket.close();
-			System.exit(-1);
+			return false;
 		}
+		return true;
 	}
 
 	/**
 	 * Attempts to get streams for reading and writing to the server connection
-	 * @return
+	 * @return False if exception occured
 	 */
-	def createIOStreams() {
+	def boolean createIOStreams() {
 		try {
 			OutputStream sockOut = socket.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(sockOut);
@@ -155,9 +159,10 @@ class IRCBlit {
 			bReader = new BufferedReader(isr);
 
 			logger.info("Set up I/O streams with the server");
+			return true;
 		} catch(IOException ex) {
 			logger.info("Failed to get I/O streams with the server");
-			System.exit(-1);
+			return false;
 		}
 	}
 
@@ -285,7 +290,7 @@ class IRCBlit {
 	/**
 	 * Sends a raw line to the irc server
 	 * @param line The line to send to the server
-	 * @return
+	 * @return False if an exception occurred
 	 */
 	def boolean sendln(line) {
 		def sent = false;
