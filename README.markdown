@@ -3,6 +3,10 @@ GitBlit IRC Service Hook
 
 IRCBlit is an IRC Service Hook for Gitblit similar to Github's.
 
+This project is one service hook. Gitblit has been included with it to make all the import statements work for testing. The file you are looking for is this one.
+
+https://github.com/BullShark/IRCBlit/blob/master/src/main/distrib/data/groovy/ircblit.groovy
+
 GitBlit Sample Hooks
 --------------------
 
