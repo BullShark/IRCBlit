@@ -24,7 +24,6 @@ All of GitHub's Service Hooks
 
 [https://github.com/github/github-services](https://github.com/github/github-services)
 
-
 Gitblit
 =================
 
