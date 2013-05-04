@@ -75,14 +75,15 @@ class IRCBlit {
 	def pollTime;
 	def received001;
 	def joined;
+	def debug;
 
 	/**
 	 * The constructor calls many helper methods
 	 * From setting up the irc connection to closing the connection
 	 * @param logger Used for logging info messages to Apache Tomcat's server logs
 	 */
-	IRCBlit(logger) {
-		initialize(logger);
+	IRCBlit(logger, debug) {
+		initialize(logger, debug);
 		if(!createIRCSocket()) {
 			return;
 		}
@@ -107,7 +108,7 @@ class IRCBlit {
 	 * Gives all the global variables default values
 	 * @return
 	 */
-	def initialize(logger) {
+	def initialize(logger, debug) {
 		server = "frequency.windfyre.net";
 		port = 6667;
 		chan = "#blackhats";
@@ -122,6 +123,7 @@ class IRCBlit {
 		pollTime = 500; // Time in ms between checks for server messages
 		received001 = false;
 		joined = false;
+		this.debug = debug; // Suppresses irc sent/received logger messages when set to false
 		//quitMsg = "GitBlit Service Hook by BullShark"
 	}
 
@@ -302,7 +304,9 @@ class IRCBlit {
 			bWriter.newLine();
 			bWriter.flush();
 			sent = true;
-			logger.info("Sent:\t${line}");
+			if(debug) {
+				logger.info("Sent:\t${line}");
+			}
 			return sent;
 		} catch (SocketException ex) {
 			logger.info("No connection to the server, exiting");
@@ -318,7 +322,9 @@ class IRCBlit {
 	def boolean receiveln() {
 		try {
 			received = bReader.readLine();
-			logger.info("Received:\t${received}");
+			if(debug) {
+				logger.info("Received:\t${received}");
+			}
 			if(received == null) {
 				return false;
 			} else {
@@ -388,10 +394,14 @@ class IRCBlit {
 	}
 }
 
-new IRCBlit(logger);
+// TODO Get the git information that will be sent to irc
+// TODO Then pass it to the constructor
+// TODO Get debug value from Gitblit Custom Fields
+def debug = true;
+new IRCBlit(logger, debug);
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
 //TODO Organize imports
 //TODO Support SSL
-//TODO Add debug variable for suppressing irc messages when it is set to false
+//TODO Add IRC Quit Message
