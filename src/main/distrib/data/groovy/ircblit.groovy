@@ -86,7 +86,7 @@ class IRCBlit {
 	 * @param logger Used for logging info messages to Apache Tomcat's server logs
 	 */
 	IRCBlit(logger, commands, debug) {
-		initialize(logger, chanMsg, debug);
+		initialize(logger, commands, debug);
 		if(!createIRCSocket()) {
 			return;
 		}
@@ -494,3 +494,4 @@ new IRCBlit(logger, commands, debug);
 //TODO Support SSL
 //TODO Add IRC Quit Message
 //TODO Remove chan argument from noticeChan() and msgChan()
+//logger, debug, commands, repository
