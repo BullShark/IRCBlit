@@ -377,6 +377,7 @@ class IRCBlit {
 		def sendDelay = 350;
 		
 		for(int i = 0; i < changesArr.length; i++) {
+			logger.info("changeArr[i]: ${changeArr[i]}")
 			if(!changesArr[i].equals("\n")) {
 				noticeChannel(chan, changesArr[i]);
 			}
