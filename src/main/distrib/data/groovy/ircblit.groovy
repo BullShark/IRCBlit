@@ -76,14 +76,15 @@ class IRCBlit {
 	def received001;
 	def joined;
 	def debug;
+	def chanMsg; // Message for the IRC channel
 
 	/**
 	 * The constructor calls many helper methods
 	 * From setting up the irc connection to closing the connection
 	 * @param logger Used for logging info messages to Apache Tomcat's server logs
 	 */
-	IRCBlit(logger, debug) {
-		initialize(logger, debug);
+	IRCBlit(logger, debug, chanMsg) {
+		initialize(logger, debug, chanMsg);
 		if(!createIRCSocket()) {
 			return;
 		}
@@ -108,7 +109,7 @@ class IRCBlit {
 	 * Gives all the global variables default values
 	 * @return
 	 */
-	def initialize(logger, debug) {
+	def initialize(logger, debug, chanMsg) {
 		server = "frequency.windfyre.net";
 		port = 6667;
 		chan = "#blackhats";
@@ -124,7 +125,8 @@ class IRCBlit {
 		received001 = false;
 		joined = false;
 		this.debug = debug; // Suppresses irc sent/received logger messages when set to false
-		//quitMsg = "GitBlit Service Hook by BullShark"
+		this.chanMsg = chanMsg;
+		//quitMsg = "GitBlit Service Hook by BullShark" //TODO
 	}
 
 	/**
@@ -287,6 +289,9 @@ class IRCBlit {
 		 * 12 light blue 13 light purple 14 dark gray 15 light gray
 		 */
 		
+		for(messages in chanMsg.split("\n")) {
+			noticeChannel(chan, chanMsg)
+		}
 	}
 
 	/**
@@ -396,9 +401,78 @@ class IRCBlit {
 
 // TODO Get the git information that will be sent to irc
 // TODO Then pass it to the constructor
+// TODO Moving this code to the class would only require passing in commands to the constructor
+// define the summary and commit urls
+def repo = repository.name
+def summaryUrl
+def commitUrl
+if (gitblit.getBoolean(Keys.web.mountParameters, true)) {
+	repo = repo.replace('/', gitblit.getString(Keys.web.forwardSlashCharacter, '/')).replace('/', '%2F')
+	summaryUrl = url + "/summary/$repo"
+	commitUrl = url + "/commit/$repo/"
+} else {
+	summaryUrl = url + "/summary?r=$repo"
+	commitUrl = url + "/commit?r=$repo&h="
+}
+
+// construct a simple text summary of the changes contained in the push
+def branchBreak = '>---------------------------------------------------------------\n'
+def commitBreak = '\n\n ----\n'
+def commitCount = 0
+def changes = ''
+SimpleDateFormat df = new SimpleDateFormat(gitblit.getString(Keys.web.datetimestampLongFormat, 'EEEE, MMMM d, yyyy h:mm a z'))
+def table = { "\n ${JGitUtils.getDisplayName(it.authorIdent)}\n ${df.format(JGitUtils.getCommitDate(it))}\n\n $it.shortMessage\n\n $commitUrl$it.id.name" }
+for (command in commands) {
+	def ref = command.refName
+	def refType = 'branch'
+	if (ref.startsWith('refs/heads/')) {
+		ref  = command.refName.substring('refs/heads/'.length())
+	} else if (ref.startsWith('refs/tags/')) {
+		ref  = command.refName.substring('refs/tags/'.length())
+		refType = 'tag'
+	}
+		
+	switch (command.type) {
+		case ReceiveCommand.Type.CREATE:
+			def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
+			commitCount += commits.size()
+			// new branch
+			changes += "\n$branchBreak new $refType $ref created ($commits.size commits)\n$branchBreak"
+			changes += commits.collect(table).join(commitBreak)
+			changes += '\n'
+			break
+		case ReceiveCommand.Type.UPDATE:
+			def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
+			commitCount += commits.size()
+			// fast-forward branch commits table
+			changes += "\n$branchBreak $ref $refType updated ($commits.size commits)\n$branchBreak"
+			changes += commits.collect(table).join(commitBreak)
+			changes += '\n'
+			break
+		case ReceiveCommand.Type.UPDATE_NONFASTFORWARD:
+			def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
+			commitCount += commits.size()
+			// non-fast-forward branch commits table
+			changes += "\n$branchBreak $ref $refType updated [NON fast-forward] ($commits.size commits)\n$branchBreak"
+			changes += commits.collect(table).join(commitBreak)
+			changes += '\n'
+			break
+		case ReceiveCommand.Type.DELETE:
+			// deleted branch/tag
+			changes += "\n$branchBreak $ref $refType deleted\n$branchBreak"
+			break
+		default:
+			break
+	}
+}
+// close the repository reference
+r.close()
+
+// tell Gitblit to send the message (Gitblit filters duplicate addresses)
+def chanMsg = "$user.username pushed $commitCount commits => $repository.name\n$summaryUrl\n$changes")
 // TODO Get debug value from Gitblit Custom Fields
 def debug = true;
-new IRCBlit(logger, debug);
+new IRCBlit(logger, debug, chanMsg);
 
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
