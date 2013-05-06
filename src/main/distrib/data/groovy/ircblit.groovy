@@ -81,14 +81,15 @@ class IRCBlit {
 	def commands;
 	def repository;
 	def gitblit;
+	def url;
 
 	/**
 	 * The constructor calls many helper methods
 	 * From setting up the irc connection to closing the connection
 	 * @param logger Used for logging info messages to Apache Tomcat's server logs
 	 */
-	IRCBlit(logger, debug, commands, repository, gitblit) {
-		initialize(logger, debug, commands, repository, gitblit);
+	IRCBlit(logger, debug, commands, repository, gitblit, url) {
+		initialize(logger, debug, commands, repository, gitblit, url);
 		if(!createIRCSocket()) {
 			return;
 		}
@@ -113,7 +114,7 @@ class IRCBlit {
 	 * Gives all the global variables default values
 	 * @return
 	 */
-	def initialize(logger, debug, commands, repository, gitblit) {
+	def initialize(logger, debug, commands, repository, gitblit, url) {
 		server = "frequency.windfyre.net";
 		port = 6667;
 		chan = "#blackhats";
@@ -134,6 +135,7 @@ class IRCBlit {
 		this.commands = commands;
 		this.repository = repository;
 		this.gitblit = gitblit;
+		this.url = url;
 	}
 
 	/**
@@ -488,7 +490,7 @@ r.close()
 
 // TODO Get debug value from Gitblit Custom Fields
 def debug = true;
-new IRCBlit(logger, debug, commands, repository, gitblit);
+new IRCBlit(logger, debug, commands, repository, gitblit, url);
 
 //TODO QUIT is never being sent to the irc connection
 //TODO Commit message and hash are missing from chanMsg
