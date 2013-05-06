@@ -77,20 +77,20 @@ class IRCBlit {
 	def received001;
 	def joined;
 	def debug;
-	def chanMsg;
 	def commands;
 	def repository;
 	def gitblit;
 	def url;
 	def r;
+	def user;
 
 	/**
 	 * The constructor calls many helper methods
 	 * From setting up the irc connection to closing the connection
 	 * @param logger Used for logging info messages to Apache Tomcat's server logs
 	 */
-	IRCBlit(logger, debug, commands, repository, gitblit, url, r) {
-		initialize(logger, debug, commands, repository, gitblit, url, r);
+	IRCBlit(logger, debug, commands, repository, gitblit, url, r, user) {
+		initialize(logger, debug, commands, repository, gitblit, url, r, user);
 		if(!createIRCSocket()) {
 			return;
 		}
@@ -103,11 +103,6 @@ class IRCBlit {
 		joinChannel();
 		waitForChannelJoined();
 		gitBlitChannel();
-		// Send a test message to the chan
-		msgChannel(chan, "ftl");
-		// Send a test notice to the chan
-		noticeChannel(chan, "Hello ${chan}");
-		gitBlitChannel();
 		quitAndCloseStreams();
 	}
 
@@ -115,7 +110,7 @@ class IRCBlit {
 	 * Gives all the global variables default values
 	 * @return
 	 */
-	def initialize(logger, debug, commands, repository, gitblit, url, r) {
+	def initialize(logger, debug, commands, repository, gitblit, url, r, user) {
 		server = "frequency.windfyre.net";
 		port = 6667;
 		chan = "#blackhats";
@@ -131,13 +126,13 @@ class IRCBlit {
 		received001 = false;
 		joined = false;
 		this.debug = debug; // Suppresses irc sent/received logger messages when set to false
-		this.chanMsg = chanMsg;
 		//quitMsg = "GitBlit Service Hook by BullShark" //TODO
 		this.commands = commands;
 		this.repository = repository;
 		this.gitblit = gitblit;
 		this.url = url;
 		this.r = r;
+		this.user = user;
 	}
 
 	/**
@@ -147,8 +142,9 @@ class IRCBlit {
 	def boolean createIRCSocket() {
 		try {
 			socket = new Socket(server, port)
+			logger.info("Made connection to ${server}/${port}");
 		} catch (IOException ex) {
-			logger.info("Failed to connect to ${server} on ${port}");
+			logger.info("Failed to connect to ${server}/${port}");
 			socket.close();
 			return false;
 		} catch (UnknownHostException ex) {
@@ -271,7 +267,8 @@ class IRCBlit {
 	}
 
 	/**
-	 * 
+	 * Generate the git messages
+	 * And send them to the channel by notice
 	 */
 	def gitBlitChannel() {
 		/*
@@ -366,9 +363,24 @@ class IRCBlit {
 			}
 		}
 
-//		def prefix = "[GitBlit]";
+		def prefix = "[GitBlit]";
 //		def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
-//		noticeChannel(chan, chanMsg);
+		def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl";
+		noticeChannel(chan, chanMsg);
+		
+//		for(String chanMsg : changes.split("\n")) {
+//			noticeChannel(chan, chanMsg);
+//		}
+		
+		def changesArr = changes.split("\n");
+		
+		def sendDelay = 200;
+		
+		for(int i = 0; i < changesArr.length; i++) {
+			noticeChannel(chan, changesArr[i]);
+			Thread.sleep(sendDelay);
+		}
+		
 	}
 
 	/**
@@ -488,7 +500,7 @@ Repository r = gitblit.getRepository(repository.name)
 
 // TODO Get debug value from Gitblit Custom Fields
 def debug = true;
-new IRCBlit(logger, debug, commands, repository, gitblit, url, r);
+new IRCBlit(logger, debug, commands, repository, gitblit, url, r, user);
 
 // close the repository reference
 r.close()
