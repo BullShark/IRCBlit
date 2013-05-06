@@ -77,6 +77,7 @@ class IRCBlit {
 	def received001;
 	def joined;
 	def debug;
+	def quitMsg;
 	def commands;
 	def repository;
 	def gitblit;
