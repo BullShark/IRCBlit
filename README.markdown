@@ -24,6 +24,13 @@ All of GitHub's Service Hooks
 
 [https://github.com/github/github-services](https://github.com/github/github-services)
 
+More Info that may be Useful in Coding the Hook
+------------------------------------------------
+
+[http://www.gitblit.com/rpc.html](http://www.gitblit.com/rpc.html)
+
+[http://expectusafterlun.ch:8888/gbapi/1.2.1/](http://expectusafterlun.ch:8888/gbapi/1.2.1/)
+
 Gitblit
 =================
 
