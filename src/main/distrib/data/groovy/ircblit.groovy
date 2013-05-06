@@ -126,7 +126,7 @@ class IRCBlit {
 		received001 = false;
 		joined = false;
 		this.debug = debug; // Suppresses irc sent/received logger messages when set to false
-		//quitMsg = "GitBlit Service Hook by BullShark" //TODO
+		quitMsg = "GitBlit Service Hook by BullShark";
 		this.commands = commands;
 		this.repository = repository;
 		this.gitblit = gitblit;
@@ -459,18 +459,15 @@ class IRCBlit {
 	}
 
 	/**
-	 * Closes all the I/O streams,
+	 * Sends QUIT to the IRC connection
+	 * Closes all the I/O streams
 	 * Stops the received thread if it is still running
-	 * And optionall sends a QUIT message to the server
-	 * Optionally because the streams might already be null and writing to them would fail
 	 * @param sendQuit Whether to send QUIT to servers input connection stream
 	 * @return
 	 */
 	def quitAndCloseStreams(sendQuit) {
 		// Leave IRC
-		if(sendQuit) {
-			sendln("QUIT");
-		}
+		sendln("QUIT :${quitMsg}");
 
 		//TODO Kill Received Thread
 		//receivedT
