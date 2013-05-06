@@ -37,6 +37,7 @@ import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
 
 /**
  * Sample Gitblit Post-Receive Hook: ircblit
