@@ -77,19 +77,20 @@ class IRCBlit {
 	def received001;
 	def joined;
 	def debug;
-	def chanMsg; // Message for the IRC channel TODO Remove me
+	def chanMsg;
 	def commands;
 	def repository;
 	def gitblit;
 	def url;
+	def r;
 
 	/**
 	 * The constructor calls many helper methods
 	 * From setting up the irc connection to closing the connection
 	 * @param logger Used for logging info messages to Apache Tomcat's server logs
 	 */
-	IRCBlit(logger, debug, commands, repository, gitblit, url) {
-		initialize(logger, debug, commands, repository, gitblit, url);
+	IRCBlit(logger, debug, commands, repository, gitblit, url, r) {
+		initialize(logger, debug, commands, repository, gitblit, url, r);
 		if(!createIRCSocket()) {
 			return;
 		}
@@ -114,7 +115,7 @@ class IRCBlit {
 	 * Gives all the global variables default values
 	 * @return
 	 */
-	def initialize(logger, debug, commands, repository, gitblit, url) {
+	def initialize(logger, debug, commands, repository, gitblit, url, r) {
 		server = "frequency.windfyre.net";
 		port = 6667;
 		chan = "#blackhats";
@@ -136,6 +137,7 @@ class IRCBlit {
 		this.repository = repository;
 		this.gitblit = gitblit;
 		this.url = url;
+		this.r = r;
 	}
 
 	/**
@@ -479,18 +481,17 @@ class IRCBlit {
 // TODO Moving this code to the class would only require passing in commands to the constructor
 // define the summary and commit urls
 
-//TODO Do we really need this? WTF is it for? Email?
 Repository r = gitblit.getRepository(repository.name)
-
-// close the repository reference
-r.close()
 
 // tell Gitblit to send the message (Gitblit filters duplicate addresses)
 //def chanMsg = "$user.username pushed $commitCount commits => $repository.name\n$summaryUrl\n$changes")
 
 // TODO Get debug value from Gitblit Custom Fields
 def debug = true;
-new IRCBlit(logger, debug, commands, repository, gitblit, url);
+new IRCBlit(logger, debug, commands, repository, gitblit, url, r);
+
+// close the repository reference
+r.close()
 
 //TODO QUIT is never being sent to the irc connection
 //TODO Commit message and hash are missing from chanMsg
