@@ -196,11 +196,7 @@ class IRCBlit {
 							} else if(received.contains("JOIN :${chan}")) {
 								joined = true;
 							}
-							if(joined && received001) {
-								break;
-							}
 						}
-						logger.info("Thread exiting: ${receivedT}");
 					}
 				};
 		receivedT.start();
