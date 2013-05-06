@@ -381,7 +381,9 @@ class IRCBlit {
 		def sendDelay = 350;
 		
 		for(int i = 0; i < changesArr.length; i++) {
-			noticeChannel(chan, changesArr[i]);
+			if(!changesArr[i].equals("\n")) {
+				noticeChannel(chan, changesArr[i]);
+			}
 			Thread.sleep(sendDelay);
 		}
 		
