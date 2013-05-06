@@ -289,9 +289,10 @@ class IRCBlit {
 		 * 12 light blue 13 light purple 14 dark gray 15 light gray
 		 */
 		
-		for(messages in chanMsg.split("\n")) {
-			noticeChannel(chan, chanMsg);
-		}
+//		for(messages in chanMsg.split("\n")) {
+//			noticeChannel(chan, chanMsg);
+//		}
+		noticeChannel(chan, chanMsg);
 	}
 
 	/**
@@ -469,7 +470,8 @@ for (command in commands) {
 r.close()
 
 // tell Gitblit to send the message (Gitblit filters duplicate addresses)
-def chanMsg = "$user.username pushed $commitCount commits => $repository.name\n$summaryUrl\n$changes")
+//def chanMsg = "$user.username pushed $commitCount commits => $repository.name\n$summaryUrl\n$changes")
+def chanMsg = "$user.username pushed $commitCount commits => $repository.name $summaryUrl\n$changes")
 // TODO Get debug value from Gitblit Custom Fields
 def debug = true;
 new IRCBlit(logger, debug, chanMsg);
