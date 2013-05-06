@@ -405,6 +405,10 @@ class IRCBlit {
 // TODO Then pass it to the constructor
 // TODO Moving this code to the class would only require passing in commands to the constructor
 // define the summary and commit urls
+
+//TODO Do we really need this? What is it for? Email?
+Repository r = gitblit.getRepository(repository.name)
+
 def repo = repository.name
 def summaryUrl
 def commitUrl
