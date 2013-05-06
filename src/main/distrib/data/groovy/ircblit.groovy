@@ -378,7 +378,7 @@ class IRCBlit {
 		
 		def changesArr = changes.split("\n");
 		
-		def sendDelay = 200;
+		def sendDelay = 350;
 		
 		for(int i = 0; i < changesArr.length; i++) {
 			noticeChannel(chan, changesArr[i]);
