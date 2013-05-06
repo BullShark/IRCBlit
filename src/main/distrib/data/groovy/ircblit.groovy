@@ -378,9 +378,10 @@ class IRCBlit {
 		
 		for(int i = 0; i < changesArr.length; i++) {
 			logger.info("changesArr[i]: ${changesArr[i]}")
-			if(!changesArr[i].equals("\n")) {
-				noticeChannel(chan, changesArr[i]);
+			if(!changesArr[i].matches("^\\S+$")) {
+				continue;
 			}
+			noticeChannel(chan, changesArr[i]);
 			Thread.sleep(sendDelay);
 		}
 		
