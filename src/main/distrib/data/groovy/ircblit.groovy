@@ -77,15 +77,16 @@ class IRCBlit {
 	def received001;
 	def joined;
 	def debug;
-	def chanMsg; // Message for the IRC channel
+	def chanMsg; // Message for the IRC channel TODO Remove me
+	def commands;
 
 	/**
 	 * The constructor calls many helper methods
 	 * From setting up the irc connection to closing the connection
 	 * @param logger Used for logging info messages to Apache Tomcat's server logs
 	 */
-	IRCBlit(logger, debug, chanMsg) {
-		initialize(logger, debug, chanMsg);
+	IRCBlit(logger, commands, debug) {
+		initialize(logger, chanMsg, debug);
 		if(!createIRCSocket()) {
 			return;
 		}
@@ -110,7 +111,7 @@ class IRCBlit {
 	 * Gives all the global variables default values
 	 * @return
 	 */
-	def initialize(logger, debug, chanMsg) {
+	def initialize(logger, commands, debug) {
 		server = "frequency.windfyre.net";
 		port = 6667;
 		chan = "#blackhats";
@@ -128,6 +129,7 @@ class IRCBlit {
 		this.debug = debug; // Suppresses irc sent/received logger messages when set to false
 		this.chanMsg = chanMsg;
 		//quitMsg = "GitBlit Service Hook by BullShark" //TODO
+		this.commands = commands;
 	}
 
 	/**
@@ -289,11 +291,76 @@ class IRCBlit {
 		 * 8 yellow 9 light green 10 dark teal 11 light teal
 		 * 12 light blue 13 light purple 14 dark gray 15 light gray
 		 */
-		
-//		for(messages in chanMsg.split("\n")) {
-//			noticeChannel(chan, chanMsg);
-//		}
-		noticeChannel(chan, chanMsg);
+
+		//		for(messages in chanMsg.split("\n")) {
+		//			noticeChannel(chan, chanMsg);
+		//		}
+		def repo = repository.name
+		def summaryUrl
+		def commitUrl
+		if (gitblit.getBoolean(Keys.web.mountParameters, true)) {
+			repo = repo.replace('/', gitblit.getString(Keys.web.forwardSlashCharacter, '/')).replace('/', '%2F')
+			summaryUrl = url + "/summary/$repo"
+			commitUrl = url + "/commit/$repo/"
+		} else {
+			summaryUrl = url + "/summary?r=$repo"
+			commitUrl = url + "/commit?r=$repo&h="
+		}
+
+		// construct a simple text summary of the changes contained in the push
+		def branchBreak = '>---------------------------------------------------------------\n'
+		def commitBreak = '\n\n ----\n'
+		def commitCount = 0
+		def changes = ''
+		SimpleDateFormat df = new SimpleDateFormat(gitblit.getString(Keys.web.datetimestampLongFormat, 'EEEE, MMMM d, yyyy h:mm a z'))
+		def table = { "\n ${JGitUtils.getDisplayName(it.authorIdent)}\n ${df.format(JGitUtils.getCommitDate(it))}\n\n $it.shortMessage\n\n $commitUrl$it.id.name" }
+		for (command in commands) {
+			def ref = command.refName
+			def refType = 'branch'
+			if (ref.startsWith('refs/heads/')) {
+				ref  = command.refName.substring('refs/heads/'.length())
+			} else if (ref.startsWith('refs/tags/')) {
+				ref  = command.refName.substring('refs/tags/'.length())
+				refType = 'tag'
+			}
+
+			switch (command.type) {
+				case ReceiveCommand.Type.CREATE:
+					def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
+					commitCount += commits.size()
+				// new branch
+					changes += "\n$branchBreak new $refType $ref created ($commits.size commits)\n$branchBreak"
+					changes += commits.collect(table).join(commitBreak)
+					changes += '\n'
+					break
+				case ReceiveCommand.Type.UPDATE:
+					def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
+					commitCount += commits.size()
+				// fast-forward branch commits table
+					changes += "\n$branchBreak $ref $refType updated ($commits.size commits)\n$branchBreak"
+					changes += commits.collect(table).join(commitBreak)
+					changes += '\n'
+					break
+				case ReceiveCommand.Type.UPDATE_NONFASTFORWARD:
+					def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
+					commitCount += commits.size()
+				// non-fast-forward branch commits table
+					changes += "\n$branchBreak $ref $refType updated [NON fast-forward] ($commits.size commits)\n$branchBreak"
+					changes += commits.collect(table).join(commitBreak)
+					changes += '\n'
+					break
+				case ReceiveCommand.Type.DELETE:
+				// deleted branch/tag
+					changes += "\n$branchBreak $ref $refType deleted\n$branchBreak"
+					break
+				default:
+					break
+			}
+		}
+
+//		def prefix = "[GitBlit]";
+//		def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
+//		noticeChannel(chan, chanMsg);
 	}
 
 	/**
@@ -406,82 +473,18 @@ class IRCBlit {
 // TODO Moving this code to the class would only require passing in commands to the constructor
 // define the summary and commit urls
 
-//TODO Do we really need this? What is it for? Email?
+//TODO Do we really need this? WTF is it for? Email?
 Repository r = gitblit.getRepository(repository.name)
 
-def repo = repository.name
-def summaryUrl
-def commitUrl
-if (gitblit.getBoolean(Keys.web.mountParameters, true)) {
-	repo = repo.replace('/', gitblit.getString(Keys.web.forwardSlashCharacter, '/')).replace('/', '%2F')
-	summaryUrl = url + "/summary/$repo"
-	commitUrl = url + "/commit/$repo/"
-} else {
-	summaryUrl = url + "/summary?r=$repo"
-	commitUrl = url + "/commit?r=$repo&h="
-}
-
-// construct a simple text summary of the changes contained in the push
-def branchBreak = '>---------------------------------------------------------------\n'
-def commitBreak = '\n\n ----\n'
-def commitCount = 0
-def changes = ''
-SimpleDateFormat df = new SimpleDateFormat(gitblit.getString(Keys.web.datetimestampLongFormat, 'EEEE, MMMM d, yyyy h:mm a z'))
-def table = { "\n ${JGitUtils.getDisplayName(it.authorIdent)}\n ${df.format(JGitUtils.getCommitDate(it))}\n\n $it.shortMessage\n\n $commitUrl$it.id.name" }
-for (command in commands) {
-	def ref = command.refName
-	def refType = 'branch'
-	if (ref.startsWith('refs/heads/')) {
-		ref  = command.refName.substring('refs/heads/'.length())
-	} else if (ref.startsWith('refs/tags/')) {
-		ref  = command.refName.substring('refs/tags/'.length())
-		refType = 'tag'
-	}
-		
-	switch (command.type) {
-		case ReceiveCommand.Type.CREATE:
-			def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
-			commitCount += commits.size()
-			// new branch
-			changes += "\n$branchBreak new $refType $ref created ($commits.size commits)\n$branchBreak"
-			changes += commits.collect(table).join(commitBreak)
-			changes += '\n'
-			break
-		case ReceiveCommand.Type.UPDATE:
-			def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
-			commitCount += commits.size()
-			// fast-forward branch commits table
-			changes += "\n$branchBreak $ref $refType updated ($commits.size commits)\n$branchBreak"
-			changes += commits.collect(table).join(commitBreak)
-			changes += '\n'
-			break
-		case ReceiveCommand.Type.UPDATE_NONFASTFORWARD:
-			def commits = JGitUtils.getRevLog(r, command.oldId.name, command.newId.name).reverse()
-			commitCount += commits.size()
-			// non-fast-forward branch commits table
-			changes += "\n$branchBreak $ref $refType updated [NON fast-forward] ($commits.size commits)\n$branchBreak"
-			changes += commits.collect(table).join(commitBreak)
-			changes += '\n'
-			break
-		case ReceiveCommand.Type.DELETE:
-			// deleted branch/tag
-			changes += "\n$branchBreak $ref $refType deleted\n$branchBreak"
-			break
-		default:
-			break
-	}
-}
 // close the repository reference
 r.close()
 
 // tell Gitblit to send the message (Gitblit filters duplicate addresses)
 //def chanMsg = "$user.username pushed $commitCount commits => $repository.name\n$summaryUrl\n$changes")
 
-def prefix = "[GitBlit]";
-def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
 // TODO Get debug value from Gitblit Custom Fields
 def debug = true;
-new IRCBlit(logger, debug, chanMsg);
+new IRCBlit(logger, commands, debug);
 
 //TODO QUIT is never being sent to the irc connection
 //TODO Commit message and hash are missing from chanMsg
@@ -490,3 +493,4 @@ new IRCBlit(logger, debug, chanMsg);
 //TODO Organize imports
 //TODO Support SSL
 //TODO Add IRC Quit Message
+//TODO Remove chan argument from noticeChan() and msgChan()
