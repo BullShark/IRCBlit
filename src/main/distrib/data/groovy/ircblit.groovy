@@ -483,6 +483,7 @@ def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository
 def debug = true;
 new IRCBlit(logger, debug, chanMsg);
 
+//TODO QUIT is never being sent to the irc connection
 //TODO Commit message and hash are missing from chanMsg
 //TODO Get Info by Accessing Gitblit Custom Fields
 //TODO And if the fields do not exist, use some defaults
