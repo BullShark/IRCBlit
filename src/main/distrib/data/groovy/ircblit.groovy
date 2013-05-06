@@ -122,7 +122,7 @@ class IRCBlit {
 		bWriter = null;
 		bReader = null;
 		this.logger = logger;
-		pollTime = 500; // Time in ms between checks for server messages
+		pollTime = 100; // Time in ms between checks for server messages
 		received001 = false;
 		joined = false;
 		this.debug = debug; // Suppresses irc sent/received logger messages when set to false
@@ -196,7 +196,11 @@ class IRCBlit {
 							} else if(received.contains("JOIN :${chan}")) {
 								joined = true;
 							}
+							if(joined && received001) {
+								break;
+							}
 						}
+						logger.info("Thread exiting: ${receivedT}");
 					}
 				};
 		receivedT.start();
