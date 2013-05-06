@@ -477,7 +477,8 @@ r.close()
 // tell Gitblit to send the message (Gitblit filters duplicate addresses)
 //def chanMsg = "$user.username pushed $commitCount commits => $repository.name\n$summaryUrl\n$changes")
 
-def chanMsg = "$emailprefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
+def prefix = "[GitBlit]";
+def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
 // TODO Get debug value from Gitblit Custom Fields
 def debug = true;
 new IRCBlit(logger, debug, chanMsg);
