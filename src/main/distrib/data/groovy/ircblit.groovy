@@ -290,7 +290,7 @@ class IRCBlit {
 		 */
 		
 		for(messages in chanMsg.split("\n")) {
-			noticeChannel(chan, chanMsg)
+			noticeChannel(chan, chanMsg);
 		}
 	}
 
