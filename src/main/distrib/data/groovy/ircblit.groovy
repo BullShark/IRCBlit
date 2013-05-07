@@ -403,20 +403,36 @@ class IRCBlit {
 		}
 
 		changes.eachLine { line, lineNum ->
-			if(debug) {
-				logger.info("Line ${lineNum}: -${line}-")
-			}
-
 			// Match if the line from the start has 0 or more whitespace characters to the end
 			if(!line.matches("^\\s*\$")) {
 				noticeChannel(chan, line);
 				Thread.sleep(sendDelay);
-			}
+			} else if(line)
 		}
 	}
 
+	/**
+	 * Gives a tinyurl short link in return for the link passed to it
+	 * @param link The link that will be used to obtain the tinyurl
+	 * @return Tinyurl link
+	 */
 	def tinyUrl(link) {
 		return "http://tinyurl.com/api-create.php?url=${link}".toURL().text;
+	}
+
+	/**
+	 * Combine two String[] arrays
+	 * @param foo First array of two to be combined
+	 * @param bar Second array of two to be combined
+	 * @param start
+	 * @return New combined array
+	 */
+	String[] combineArrays(foo, bar, int start) {
+		[
+			*foo[0..<start],
+			*bar,
+			*foo[start..<foo.size()]
+		]
 	}
 
 	/**
@@ -500,10 +516,10 @@ class IRCBlit {
 	def quitAndCloseStreams(sendQuit) {
 		// Give the server a second before sending QUIT
 		Thread.sleep(1000);
-		
+
 		// Leave IRC
 		if(bWriter != null) {
-			sendln("QUIT :${quitMsg}");
+			sendln("QUIT :\"${quitMsg}\"");
 		} else {
 			logger.info("socket is null, not sending QUIT")
 		}
