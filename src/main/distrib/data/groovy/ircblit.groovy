@@ -187,7 +187,7 @@ class IRCBlit {
 		receivedT = new Thread() {
 					public void run() {
 						logger.info("Thread started: ${receivedT}");
-						while(receiveln()) {
+						while(receiveln() != false) {
 							divideTwo();
 
 							if(first.equals("PING")) {
@@ -198,6 +198,7 @@ class IRCBlit {
 								joined = true;
 							}
 						}
+						logger.info("Thread exiting: ${receivedT}");
 					}
 				};
 		receivedT.start();
@@ -312,9 +313,9 @@ class IRCBlit {
 			summaryUrl = url + "/summary?r=$repo"
 			commitUrl = url + "/commit?r=$repo&h="
 		}
-
+		
 		// construct a simple text summary of the changes contained in the push
-		def branchBreak = '>---------------------------------------------------------------\n'
+		def branchBreak = '>---------------------------------------\n'
 		def commitBreak = '\n\n ----\n'
 		def commitCount = 0
 		def changes = ''
@@ -364,28 +365,35 @@ class IRCBlit {
 			}
 		}
 
-		def prefix = "[GitBlit]";
+		def sendDelay = 350; // Time between sending messages
+		
+		def msgArr = ["[GitBlit] {$user.username} pushed ${commitCount} commits =>", "${repository.name} ${tinyUrl(summaryUrl)}"] as String[];
+			
+		for(int i = 0; i < msgArr.length; i++) {
+			noticeChannel(chan, msgArr[i]);
+			Thread.sleep(sendDelay);
+		}
+			
 //		def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
-		def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl";
-		noticeChannel(chan, chanMsg);
-		
-//		for(String chanMsg : changes.split("\n")) {
-//			noticeChannel(chan, chanMsg);
-//		}
-		
+//		def chanMsg = "$user.username pushed $commitCount commits => $repository.name $summaryUrl";
+//		noticeChannel(chan, chanMsg);
+
 		def changesArr = changes.split("\n");
-		
-		def sendDelay = 350;
 		
 		for(int i = 0; i < changesArr.length; i++) {
 			logger.info("changesArr[i]: ${changesArr[i]}")
-			if(!changesArr[i].matches("\\S+")) {
+			// Match if the line from the start has 0 or more whitespace characters to the end
+			if(changesArr[i].matches("^\\s*\$")) {
 				continue;
 			}
 			noticeChannel(chan, changesArr[i]);
 			Thread.sleep(sendDelay);
 		}
-		
+	}
+	
+    // TODO Is return type needed?
+	def tinyUrl(link) {
+		return "http://tinyurl.com/api-create.php?url=${link}".toURL().text;
 	}
 
 	/**
@@ -468,7 +476,14 @@ class IRCBlit {
 	 */
 	def quitAndCloseStreams(sendQuit) {
 		// Leave IRC
-		sendln("QUIT :${quitMsg}");
+		if(bWriter != null) {
+			sendln("QUIT :${quitMsg}");
+		} else {
+			logger.info("socket is null, not sending QUIT")
+		}
+		
+		// Give server a sec
+		Thread.sleep(1000);
 
 		//TODO Kill Received Thread
 		//receivedT
