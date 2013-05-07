@@ -498,6 +498,9 @@ class IRCBlit {
 	 * @return
 	 */
 	def quitAndCloseStreams(sendQuit) {
+		// Give the server a second before sending QUIT
+		Thread.sleep(1000);
+		
 		// Leave IRC
 		if(bWriter != null) {
 			sendln("QUIT :${quitMsg}");
