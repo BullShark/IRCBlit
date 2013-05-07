@@ -127,7 +127,7 @@ class IRCBlit {
 		received001 = false;
 		joined = false;
 		this.debug = debug; // Suppresses irc sent/received logger messages when set to false
-		quitMsg = "GitBlit Service Hook by BullShark";
+		quitMsg = "IRCBlit by BullShark";
 		this.commands = commands;
 		this.repository = repository;
 		this.gitblit = gitblit;
