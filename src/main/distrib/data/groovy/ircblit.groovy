@@ -140,7 +140,7 @@ class IRCBlit {
 	 * Attempts to create the socket connection to the IRC server on a specified port
 	 * @return False if an exception occurred
 	 */
-	def boolean createIRCSocket() {
+	def createIRCSocket() {
 		try {
 			socket = new Socket(server, port)
 			logger.info("Made connection to ${server}/${port}");
@@ -160,7 +160,7 @@ class IRCBlit {
 	 * Attempts to get streams for reading and writing to the server connection
 	 * @return False if exception occured
 	 */
-	def boolean createIOStreams() {
+	def createIOStreams() {
 		try {
 			OutputStream sockOut = socket.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(sockOut);
@@ -313,7 +313,7 @@ class IRCBlit {
 			summaryUrl = url + "/summary?r=$repo"
 			commitUrl = url + "/commit?r=$repo&h="
 		}
-		
+
 		// construct a simple text summary of the changes contained in the push
 		def branchBreak = '>---------------------------------------\n'
 		def commitBreak = '\n\n ----\n'
@@ -365,33 +365,56 @@ class IRCBlit {
 			}
 		}
 
+		//		def sendDelay = 350; // Time between sending messages
+		//
+		//		def msgArr = ["[GitBlit] {$user.username} pushed ${commitCount} commits =>", "${repository.name} ${tinyUrl(summaryUrl)}"] as String[];
+		//
+		//		for(int i = 0; i < msgArr.length; i++) {
+		//			noticeChannel(chan, msgArr[i]);
+		//			Thread.sleep(sendDelay);
+		//		}
+		//
+		////		def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
+		////		def chanMsg = "$user.username pushed $commitCount commits => $repository.name $summaryUrl";
+		////		noticeChannel(chan, chanMsg);
+		//
+		//		def changesArr = changes.split("\n");
+		//
+		//		for(int i = 0; i < changesArr.length; i++) {
+		//			logger.info("changesArr[i]: ${changesArr[i]}")
+		//			// Match if the line from the start has 0 or more whitespace characters to the end
+		//			if(changesArr[i].matches("^\\s*\$")) {
+		//				continue;
+		//			}
+		//			noticeChannel(chan, changesArr[i]);
+		//			Thread.sleep(sendDelay);
+		//		}
+
 		def sendDelay = 350; // Time between sending messages
-		
-		def msgArr = ["[GitBlit] {$user.username} pushed ${commitCount} commits =>", "${repository.name} ${tinyUrl(summaryUrl)}"] as String[];
-			
-		for(int i = 0; i < msgArr.length; i++) {
-			noticeChannel(chan, msgArr[i]);
+
+		def msgArr = [
+			"[GitBlit] {${user.username}} pushed ${commitCount} commits =>",
+			"${repository.name} ${tinyUrl(summaryUrl)}"
+		]
+
+		msgArr.each { msg ->
+			noticeChannel(chan, msg)
 			Thread.sleep(sendDelay);
 		}
-			
-//		def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
-//		def chanMsg = "$user.username pushed $commitCount commits => $repository.name $summaryUrl";
-//		noticeChannel(chan, chanMsg);
 
-		def changesArr = changes.split("\n");
-		
-		for(int i = 0; i < changesArr.length; i++) {
-			logger.info("changesArr[i]: ${changesArr[i]}")
-			// Match if the line from the start has 0 or more whitespace characters to the end
-			if(changesArr[i].matches("^\\s*\$")) {
-				continue;
+		changes.eachLine { line, lineNum ->
+			if(debug) {
+				logger.info("Line ${lineNum}: -${line}-")
 			}
-			noticeChannel(chan, changesArr[i]);
-			Thread.sleep(sendDelay);
+
+			// Match if the line from the start has 0 or more whitespace characters to the end
+			if(!line.matches("^\\s*\$")) {
+				noticeChannel(chan, line);
+				Thread.sleep(sendDelay);
+			}
 		}
 	}
-	
-    // TODO Is return type needed?
+
 	def tinyUrl(link) {
 		return "http://tinyurl.com/api-create.php?url=${link}".toURL().text;
 	}
@@ -401,7 +424,7 @@ class IRCBlit {
 	 * @param line The line to send to the server
 	 * @return False if an exception occurred
 	 */
-	def boolean sendln(line) {
+	def sendln(line) {
 		def sent = false;
 		try {
 			if(socket == null || bWriter == null) {
@@ -426,7 +449,7 @@ class IRCBlit {
 	 * Attempt to receive a line from the server connection
 	 * @return True if a line was received, false otherwise
 	 */
-	def boolean receiveln() {
+	def receiveln() {
 		try {
 			received = bReader.readLine();
 			if(debug) {
@@ -481,7 +504,7 @@ class IRCBlit {
 		} else {
 			logger.info("socket is null, not sending QUIT")
 		}
-		
+
 		// Give server a sec
 		Thread.sleep(1000);
 
