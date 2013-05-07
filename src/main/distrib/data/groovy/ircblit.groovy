@@ -407,7 +407,6 @@ class IRCBlit {
 			if(!line.matches("^\\s*\$")) {
 				noticeChannel(chan, line);
 				Thread.sleep(sendDelay);
-			} else if(line)
 		}
 	}
 
