@@ -19,6 +19,7 @@ import com.gitblit.Keys;
 import com.gitblit.models.RepositoryModel;
 import com.gitblit.models.UserModel;
 import com.gitblit.utils.JGitUtils;
+
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.ReceiveCommand;
@@ -84,6 +85,7 @@ class IRCBlit {
 	def url;
 	def r;
 	def user;
+	def sendDelay;
 
 	/**
 	 * The constructor calls many helper methods
@@ -134,6 +136,7 @@ class IRCBlit {
 		this.url = url;
 		this.r = r;
 		this.user = user;
+		sendDelay = 350; // Time between sending messages
 	}
 
 	/**
@@ -142,7 +145,7 @@ class IRCBlit {
 	 */
 	def createIRCSocket() {
 		try {
-			socket = new Socket(server, port)
+			socket = new Socket(server, port);
 			logger.info("Made connection to ${server}/${port}");
 		} catch (IOException ex) {
 			logger.info("Failed to connect to ${server}/${port}");
@@ -299,9 +302,6 @@ class IRCBlit {
 		 * 12 light blue 13 light purple 14 dark gray 15 light gray
 		 */
 
-		//		for(messages in chanMsg.split("\n")) {
-		//			noticeChannel(chan, chanMsg);
-		//		}
 		def repo = repository.name
 		def summaryUrl
 		def commitUrl
@@ -313,6 +313,10 @@ class IRCBlit {
 			summaryUrl = url + "/summary?r=$repo"
 			commitUrl = url + "/commit?r=$repo&h="
 		}
+
+		// Tinyurl the links
+		def tinySummary = tinyUrl(summaryUrl);
+		def tinyCommit = tinyUrl(commitUrl)
 
 		// construct a simple text summary of the changes contained in the push
 		def branchBreak = '>---------------------------------------\n'
@@ -380,33 +384,37 @@ class IRCBlit {
 		//
 		//		def changesArr = changes.split("\n");
 		//
-		//		for(int i = 0; i < changesArr.length; i++) {
-		//			logger.info("changesArr[i]: ${changesArr[i]}")
-		//			// Match if the line from the start has 0 or more whitespace characters to the end
-		//			if(changesArr[i].matches("^\\s*\$")) {
-		//				continue;
-		//			}
-		//			noticeChannel(chan, changesArr[i]);
-		//			Thread.sleep(sendDelay);
-		//		}
+		//				for(int i = 0; i < changesArr.length; i++) {
+		//					logger.info("changesArr[i]: ${changesArr[i]}")
+		//					// Match if the line from the start has 0 or more whitespace characters to the end
+		//					if(changesArr[i].matches("^\\s*\$")) {
+		//						continue;
+		//					}
+		//					noticeChannel(chan, changesArr[i]);
+		//					Thread.sleep(sendDelay);
+		//				}
 
-		def sendDelay = 350; // Time between sending messages
+		def msgs = [
+			"[GitBlit] ${user.username} pushed ${commitCount} commits =>",
+			"${repository.name} ${tinySummary}"
+		] as String[];
 
-		def msgArr = [
-			"[GitBlit] {${user.username}} pushed ${commitCount} commits =>",
-			"${repository.name} ${tinyUrl(summaryUrl)}"
-		]
-
-		msgArr.each { msg ->
-			noticeChannel(chan, msg)
+		msgs.each { msg ->
+			noticeChannel(chan, msg);
 			Thread.sleep(sendDelay);
 		}
 
+		logger.info("commitUrl: ${commitUrl}");
 		changes.eachLine { line, lineNum ->
 			// Match if the line from the start has 0 or more whitespace characters to the end
-			if(!line.matches("^\\s*\$")) {
-				noticeChannel(chan, line);
-				Thread.sleep(sendDelay);
+			if(line.matches("^\\s*\$")) {
+				return;
+			} else if(line.contains(commitUrl)) {
+				logger.info("line contains ${commitUrl}");
+				line.replace(commitUrl, tinyCommit);
+			}
+			noticeChannel(chan, line);
+			Thread.sleep(sendDelay);
 		}
 	}
 
@@ -417,21 +425,6 @@ class IRCBlit {
 	 */
 	def tinyUrl(link) {
 		return "http://tinyurl.com/api-create.php?url=${link}".toURL().text;
-	}
-
-	/**
-	 * Combine two String[] arrays
-	 * @param foo First array of two to be combined
-	 * @param bar Second array of two to be combined
-	 * @param start
-	 * @return New combined array
-	 */
-	String[] combineArrays(foo, bar, int start) {
-		[
-			*foo[0..<start],
-			*bar,
-			*foo[start..<foo.size()]
-		]
 	}
 
 	/**
