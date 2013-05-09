@@ -14,31 +14,13 @@
  * limitations under the License.
  */
 
-import com.gitblit.GitBlit;
-import com.gitblit.Keys;
-import com.gitblit.models.RepositoryModel;
-import com.gitblit.models.UserModel;
-import com.gitblit.utils.JGitUtils;
+import java.text.SimpleDateFormat
 
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.transport.ReceiveCommand;
-import org.eclipse.jgit.transport.ReceiveCommand.Result;
-import java.io.BufferedReader;
-import org.slf4j.Logger;
+import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.transport.ReceiveCommand
 
-import sun.org.mozilla.javascript.tools.shell.QuitAction;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.OutputStream;
-import java.io.BufferedWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.net.SocketException;
-import java.text.SimpleDateFormat;
+import com.gitblit.Keys
+import com.gitblit.utils.JGitUtils
 
 /**
  * Sample Gitblit Post-Receive Hook: ircblit
@@ -274,21 +256,22 @@ class IRCBlit {
 	/**
 	 * Generate the git messages
 	 * And send them to the channel by notice
+	 * @return
 	 */
 	def gitBlitChannel() {
 		/*
 		 * Produce similar messages to these here in this method:
 		 * 
-		 --> | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
+		 | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
 		 | joined #blackhats                                               
-		 -- | Mode #blackhats [+v GitHubbed] by BHBot                         
-		 -- | Notice(GitHubbed): [JRobo] BullShark pushed 2 new commits to    
+		 | Mode #blackhats [+v GitHubbed] by BHBot                         
+		 | Notice(GitHubbed): [JRobo] BullShark pushed 2 new commits to    
 		 | master: http://git.io/JthFbQ                                    
-		 -- | Notice(GitHubbed): JRobo/master b2ca398 BullShark: lol          
-		 -- | Notice(GitHubbed): JRobo/master 919dab3 BullShark: Attempting to
+		 | Notice(GitHubbed): JRobo/master b2ca398 BullShark: Fixed expression never evaulating to true
+		 | Notice(GitHubbed): JRobo/master 919dab3 BullShark: Attempting to
 		 | fix bug preventing wr not working and failure to respond to ping
 		 | while getUsers() is being called                                
-		 <-- | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
+		 | GitHubbed (GitHubbed@protectedhost-8DD5CCAF.rs.github.com) has  
 		 | left #blackhats
 		 *                                                 
 		 */
@@ -316,7 +299,7 @@ class IRCBlit {
 
 		// Tinyurl the links
 		def tinySummary = tinyUrl(summaryUrl);
-		def tinyCommit = tinyUrl(commitUrl)
+		def tinyCommit = tinyUrl(commitUrl);
 
 		// construct a simple text summary of the changes contained in the push
 		def branchBreak = '>---------------------------------------\n'
@@ -369,38 +352,13 @@ class IRCBlit {
 			}
 		}
 
-		//		def sendDelay = 350; // Time between sending messages
-		//
-		//		def msgArr = ["[GitBlit] {$user.username} pushed ${commitCount} commits =>", "${repository.name} ${tinyUrl(summaryUrl)}"] as String[];
-		//
-		//		for(int i = 0; i < msgArr.length; i++) {
-		//			noticeChannel(chan, msgArr[i]);
-		//			Thread.sleep(sendDelay);
-		//		}
-		//
-		////		def chanMsg = "$prefix $user.username pushed $commitCount commits => $repository.name $summaryUrl $changes";
-		////		def chanMsg = "$user.username pushed $commitCount commits => $repository.name $summaryUrl";
-		////		noticeChannel(chan, chanMsg);
-		//
-		//		def changesArr = changes.split("\n");
-		//
-		//				for(int i = 0; i < changesArr.length; i++) {
-		//					logger.info("changesArr[i]: ${changesArr[i]}")
-		//					// Match if the line from the start has 0 or more whitespace characters to the end
-		//					if(changesArr[i].matches("^\\s*\$")) {
-		//						continue;
-		//					}
-		//					noticeChannel(chan, changesArr[i]);
-		//					Thread.sleep(sendDelay);
-		//				}
-
 		def msgs = [
 			"[GitBlit] ${user.username} pushed ${commitCount} commits =>",
 			"${repository.name} ${tinySummary}"
 		] as String[];
 
 		msgs.each { msg ->
-			noticeChannel(chan, msg);
+			noticeChannel(msg);
 			Thread.sleep(sendDelay);
 		}
 
@@ -410,10 +368,9 @@ class IRCBlit {
 			if(line.matches("^\\s*\$")) {
 				return;
 			} else if(line.contains(commitUrl)) {
-				logger.info("line contains ${commitUrl}");
-				line.replace(commitUrl, tinyCommit);
+				line = " ${tinyCommit}";
 			}
-			noticeChannel(chan, line);
+			noticeChannel(line);
 			Thread.sleep(sendDelay);
 		}
 	}
@@ -476,11 +433,10 @@ class IRCBlit {
 
 	/**
 	 * Sends a message to a channel
-	 * @param chan Channel to send the message to
 	 * @param msg Message to be sent to the channel
 	 * @return
 	 */
-	def msgChannel(chan, msg) {
+	def msgChannel(msg) {
 		if( !sendln("PRIVMSG " + chan + " :" + msg) ) {
 			logger.info("Failed to send message: \"${msg}\" to chan ${chan}");
 		}
@@ -488,11 +444,10 @@ class IRCBlit {
 
 	/**
 	 * Sends a notice to a channel
-	 * @param chan Channel to send the notice to
 	 * @param msg Notice to be sent to the channel
 	 * @return
 	 */
-	def noticeChannel(chan, msg) {
+	def noticeChannel(msg) {
 		if( !sendln("NOTICE " + chan + " :" + msg) ) {
 			logger.info("Failed to send notice: \"${msg}\" to chan ${chan}");
 		}
@@ -505,22 +460,16 @@ class IRCBlit {
 	 * @param sendQuit Whether to send QUIT to servers input connection stream
 	 * @return
 	 */
-	def quitAndCloseStreams(sendQuit) {
+	def quitAndCloseStreams() {
 		// Give the server a second before sending QUIT
 		Thread.sleep(1000);
 
 		// Leave IRC
 		if(bWriter != null) {
-			sendln("QUIT :\"${quitMsg}\"");
+			sendln("QUIT :${quitMsg}");
 		} else {
 			logger.info("socket is null, not sending QUIT")
 		}
-
-		// Give server a sec
-		Thread.sleep(1000);
-
-		//TODO Kill Received Thread
-		//receivedT
 
 		// Close I/O
 		bWriter.close();
@@ -528,26 +477,14 @@ class IRCBlit {
 		socket.close();
 		logger.info("Closed all I/O streams");
 	}
-
-	/**
-	 * Wrapper class to quitAndCloseStreams(boolean sendQuit)
-	 * Defaults to sending QUIT to the IRC server
-	 * @return
-	 */
-	def quitAndCloseStreams() {
-		quitAndCloseStreams(true);
-	}
 }
 
-// TODO Get the git information that will be sent to irc
-// TODO Then pass it to the constructor
-// TODO Moving this code to the class would only require passing in commands to the constructor
-// define the summary and commit urls
+def fogbugzUrl = repository.customFields.fogbugzUrl
+def fogbugzRepositoryId = repository.customFields.fogbugzRepositoryId
+def bugIdRegex = repository.customFields.fogbugzCommitMessageRegex
 
 Repository r = gitblit.getRepository(repository.name)
 
-// tell Gitblit to send the message (Gitblit filters duplicate addresses)
-//def chanMsg = "$user.username pushed $commitCount commits => $repository.name\n$summaryUrl\n$changes")
 
 // TODO Get debug value from Gitblit Custom Fields
 def debug = true;
@@ -563,4 +500,3 @@ r.close()
 //TODO Organize imports
 //TODO Support SSL
 //TODO Add IRC Quit Message
-//TODO Remove chan argument from noticeChan() and msgChan()
