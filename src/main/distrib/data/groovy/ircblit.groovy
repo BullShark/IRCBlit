@@ -479,11 +479,16 @@ class IRCBlit {
 	}
 }
 
-def fogbugzUrl = repository.customFields.fogbugzUrl
-def fogbugzRepositoryId = repository.customFields.fogbugzRepositoryId
-def bugIdRegex = repository.customFields.fogbugzCommitMessageRegex
+//def fogbugzUrl = repository.customFields.fogbugzUrl
+//def fogbugzRepositoryId = repository.customFields.fogbugzRepositoryId
+//def bugIdRegex = repository.customFields.fogbugzCommitMessageRegex
 
-Repository r = gitblit.getRepository(repository.name)
+//def ircblitDebug = repository.customFields.ircblitDebug;
+//def ircblitServer = repository.customFields.ircblitServer;
+//def ircblitPort = repository.customFields.ircblitPort;
+//def ircblitChannel = repository.customFields.ircblitChannel;
+
+Repository r = gitblit.getRepository(repository.name);
 
 
 // TODO Get debug value from Gitblit Custom Fields
@@ -491,7 +496,7 @@ def debug = true;
 new IRCBlit(logger, debug, commands, repository, gitblit, url, r, user);
 
 // close the repository reference
-r.close()
+r.close();
 
 //TODO QUIT is never being sent to the irc connection
 //TODO Commit message and hash are missing from chanMsg
