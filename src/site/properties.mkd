@@ -1,2 +1,0 @@
-## gitblit.properties
-%PROPERTIES%

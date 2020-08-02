@@ -1,3 +1,0 @@
-## Faça o Login
-
-Por favor, entre com suas credenciais para acessar o site Gitblit.

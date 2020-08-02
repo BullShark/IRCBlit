@@ -1,3 +1,0 @@
-## Zaloguj się
-
-Wprowadź swoje dane uwierzytelniające, aby uzyskać dostęp do instancji Gitblita.

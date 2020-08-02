@@ -1,3 +1,0 @@
-## Debes validarte
-
-Por favor, introduce tus credenciales para acceder Gitblit.
